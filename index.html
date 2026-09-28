@@ -456,11 +456,11 @@
         </div>
     </div>
 
-    <!-- EMAIL PREVIEW & SEND MODAL -->
+    <!-- EMAIL PREVIEW & LIVE SEND MODAL -->
     <div x-show="emailModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-lg p-6 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="font-bold text-slate-100 text-sm">Automated Email Preview</h3>
+                <h3 class="font-bold text-slate-100 text-sm">Automated Email Preview & Send</h3>
                 <button @click="emailModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="space-y-3 text-xs">
@@ -474,7 +474,7 @@
             </div>
             <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
                 <button @click="emailModal = false" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Cancel</button>
-                <button @click="sendAutomatedEmail()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Send Email & Advance Day</button>
+                <button @click="sendAutomatedEmail()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Launch Email Client & Advance Day</button>
             </div>
         </div>
     </div>
@@ -714,8 +714,12 @@
                         p.dayInPlan = Math.min(90, p.dayInPlan + 7);
                         this.saveData();
                     }
+
+                    // Open local default mail client (Outlook / Apple Mail) with prefilled details
+                    const mailtoUrl = `mailto:${encodeURIComponent(this.activeEmail.to)}?subject=${encodeURIComponent(this.activeEmail.subject)}&body=${encodeURIComponent(this.activeEmail.body)}`;
+                    window.location.href = mailtoUrl;
+
                     this.emailModal = false;
-                    alert('Automated email successfully sent and prospect advanced in the 90-day plan!');
                 },
 
                 advanceProspectDay(p) {
