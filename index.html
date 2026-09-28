@@ -456,17 +456,17 @@
         </div>
     </div>
 
-    <!-- EMAIL PREVIEW & M365 SEND MODAL -->
+    <!-- EMAIL PREVIEW & MAILTO DRAFT MODAL -->
     <div x-show="emailModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-lg p-6 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="font-bold text-slate-100 text-sm">Microsoft 365 Email Preview & Sender Selection</h3>
+                <h3 class="font-bold text-slate-100 text-sm">Email Preview & Sender Selection</h3>
                 <button @click="emailModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="space-y-3 text-xs">
-                <!-- M365 Sender Account Selector -->
+                <!-- M365 Sender Reference / Note -->
                 <div>
-                    <label class="block text-slate-400 mb-1 font-medium">Send From M365 Account:</label>
+                    <label class="block text-slate-400 mb-1 font-medium">Active Sending Profile:</label>
                     <select x-model="activeEmail.sender" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
                         <option value="brian@lakeconroems.com">brian@lakeconroems.com (Sales Outreach)</option>
                         <option value="support@lakeconroems.com">support@lakeconroems.com (Support & Onboarding)</option>
@@ -484,7 +484,7 @@
             </div>
             <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
                 <button @click="emailModal = false" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Cancel</button>
-                <button @click="sendAutomatedEmail()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Open M365 Outlook & Advance Day</button>
+                <button @click="sendAutomatedEmail()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Open Draft in Mail App & Advance Day</button>
             </div>
         </div>
     </div>
@@ -713,7 +713,7 @@
                         to: prospect.email,
                         subject: template.title + ' - ' + this.settings.companyName,
                         body: body,
-                        sender: 'brian@lakeconroems.com', // Default M365 sender
+                        sender: 'brian@lakeconroems.com',
                         prospectId: prospect.id
                     };
                     this.emailModal = true;
@@ -726,9 +726,9 @@
                         this.saveData();
                     }
 
-                    // Open Microsoft 365 Outlook Web Compose in a new tab
-                    const outlookUrl = `https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(this.activeEmail.to)}&subject=${encodeURIComponent(this.activeEmail.subject)}&body=${encodeURIComponent(this.activeEmail.body)}`;
-                    window.open(outlookUrl, '_blank');
+                    // Bulletproof mailto draft generation
+                    const mailtoUrl = `mailto:${this.activeEmail.to}?subject=${encodeURIComponent(this.activeEmail.subject)}&body=${encodeURIComponent(this.activeEmail.body)}`;
+                    window.location.href = mailtoUrl;
 
                     this.emailModal = false;
                 },
