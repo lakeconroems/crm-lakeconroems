@@ -52,7 +52,7 @@
                 <div class="mb-6 bg-slate-800 border border-slate-700 p-4 rounded-xl flex items-center justify-between">
                     <div class="text-sm text-slate-300">
                         <span class="font-semibold text-blue-400">SharePoint Site URL:</span> 
-                        <input type="text" id="siteUrlInput" value="https://yourtenant.sharepoint.com/sites/YourRMPSite" class="ml-2 bg-slate-900 border border-slate-700 rounded px-3 py-1 text-xs w-96 text-slate-200 focus:outline-none focus:border-blue-500">
+                        <input type="text" id="siteUrlInput" value="https://lakeconroems.sharepoint.com/sites/CRM" class="ml-2 bg-slate-900 border border-slate-700 rounded px-3 py-1 text-xs w-96 text-slate-200 focus:outline-none focus:border-blue-500">
                     </div>
                     <button onclick="refreshData()" class="bg-blue-600 hover:bg-blue-500 text-xs px-4 py-2 rounded font-medium transition">Update Connection</button>
                 </div>
@@ -231,11 +231,9 @@
         }
 
         async function triggerLeadEmail(leadId, siteUrl) {
-            // Step-by-step REST API update to set TriggerEmail to 'Yes'
             const endpoint = `${siteUrl}/_api/web/lists/getbytitle('Leads')/items(${leadId})`;
             
             try {
-                // Get request digest for SharePoint write operations
                 const digestRes = await fetch(`${siteUrl}/_api/contextinfo`, {
                     method: 'POST',
                     headers: { "Accept": "application/json;odata=verbose" }
@@ -243,7 +241,6 @@
                 const digestData = await digestRes.json();
                 const formDigest = digestData.d.GetContextWebInformation.FormDigestValue;
 
-                // Update item TriggerEmail = "Yes"
                 const updateRes = await fetch(endpoint, {
                     method: 'POST',
                     headers: {
@@ -271,7 +268,6 @@
             }
         }
 
-        // Initial load
         window.onload = loadTickets;
     </script>
 </body>
