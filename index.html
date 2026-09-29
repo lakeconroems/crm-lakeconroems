@@ -101,9 +101,8 @@
 
                 <!-- 1. DASHBOARD TAB -->
                 <div x-show="currentTab === 'dashboard'" class="space-y-6">
-                    <!-- KPI Cards (All Clickable to respective sections) -->
+                    <!-- KPI Cards -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <!-- Total MRR Card -->
                         <div @click="currentTab = 'clients'" class="bg-dark-900 border border-slate-800 p-5 rounded-2xl shadow-sm cursor-pointer hover:border-indigo-500/50 transition group">
                             <div class="flex items-center justify-between text-slate-400 mb-2">
                                 <span class="text-xs font-medium uppercase tracking-wider group-hover:text-indigo-400 transition">Total Monthly MRR</span>
@@ -116,7 +115,6 @@
                             </div>
                         </div>
 
-                        <!-- Active Sales Prospects Card -->
                         <div @click="currentTab = 'prospects'" class="bg-dark-900 border border-slate-800 p-5 rounded-2xl shadow-sm cursor-pointer hover:border-indigo-500/50 transition group">
                             <div class="flex items-center justify-between text-slate-400 mb-2">
                                 <span class="text-xs font-medium uppercase tracking-wider group-hover:text-indigo-400 transition">Active Sales Prospects</span>
@@ -129,7 +127,6 @@
                             </div>
                         </div>
 
-                        <!-- Open Support Tickets Card -->
                         <div @click="currentTab = 'tickets'" class="bg-dark-900 border border-slate-800 p-5 rounded-2xl shadow-sm cursor-pointer hover:border-indigo-500/50 transition group">
                             <div class="flex items-center justify-between text-slate-400 mb-2">
                                 <span class="text-xs font-medium uppercase tracking-wider group-hover:text-indigo-400 transition">Open Support Tickets</span>
@@ -142,7 +139,6 @@
                             </div>
                         </div>
 
-                        <!-- Active MSP Clients Card -->
                         <div @click="currentTab = 'clients'" class="bg-dark-900 border border-slate-800 p-5 rounded-2xl shadow-sm cursor-pointer hover:border-indigo-500/50 transition group">
                             <div class="flex items-center justify-between text-slate-400 mb-2">
                                 <span class="text-xs font-medium uppercase tracking-wider group-hover:text-indigo-400 transition">Active MSP Clients</span>
@@ -176,7 +172,12 @@
                                     <tbody class="divide-y divide-slate-800">
                                         <template x-for="p in prospects.slice(0, 5)" :key="p.id">
                                             <tr class="hover:bg-slate-800/30">
-                                                <td class="p-3 font-medium text-slate-200" x-text="p.company"></td>
+                                                <td class="p-3 font-medium text-slate-200">
+                                                    <button @click="openProspectFile(p)" class="text-indigo-400 hover:underline text-left font-medium flex items-center space-x-1.5">
+                                                        <i class="fa-solid fa-folder-open text-xs"></i>
+                                                        <span x-text="p.company"></span>
+                                                    </button>
+                                                </td>
                                                 <td class="p-3">
                                                     <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" x-text="p.stage"></span>
                                                 </td>
@@ -197,9 +198,9 @@
                                 <h3 class="font-semibold text-slate-200 text-sm mb-4">Service Desk Queue</h3>
                                 <div class="space-y-3">
                                     <template x-for="ticket in tickets.slice(0, 4)" :key="ticket.id">
-                                        <div class="p-3 bg-slate-800/40 border border-slate-800 rounded-xl flex items-center justify-between">
+                                        <div @click="openTicketFile(ticket)" class="p-3 bg-slate-800/40 border border-slate-800 rounded-xl flex items-center justify-between cursor-pointer hover:border-indigo-500/50 transition">
                                             <div>
-                                                <p class="text-xs font-semibold text-slate-200" x-text="ticket.title"></p>
+                                                <p class="text-xs font-semibold text-indigo-400 hover:underline" x-text="'#MSP-' + ticket.id + ': ' + ticket.title"></p>
                                                 <p class="text-[10px] text-slate-400" x-text="ticket.client"></p>
                                             </div>
                                             <span class="px-2 py-0.5 rounded text-[10px] font-bold"
@@ -219,7 +220,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="text-lg font-bold text-slate-100">Managed Clients</h3>
-                            <p class="text-xs text-slate-400">Manage client agreements, endpoints, and recurring monthly revenue.</p>
+                            <p class="text-xs text-slate-400">Manage client agreements, endpoints, and recurring monthly revenue. Click any client name to open their file.</p>
                         </div>
                         <button @click="openClientModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-xl font-medium transition shadow-sm flex items-center space-x-2">
                             <i class="fa-solid fa-plus"></i>
@@ -233,8 +234,11 @@
                                 <div>
                                     <div class="flex items-start justify-between">
                                         <div>
-                                            <h4 class="font-bold text-slate-100 text-base" x-text="client.name"></h4>
-                                            <p class="text-xs text-slate-400" x-text="client.contactPerson"></p>
+                                            <button @click="openClientFile(client)" class="font-bold text-slate-100 hover:text-indigo-400 text-base text-left flex items-center space-x-2 transition">
+                                                <i class="fa-solid fa-folder-open text-xs text-indigo-400"></i>
+                                                <span x-text="client.name"></span>
+                                            </button>
+                                            <p class="text-xs text-slate-400 mt-0.5" x-text="client.contactPerson"></p>
                                         </div>
                                         <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" x-text="client.tier"></span>
                                     </div>
@@ -254,6 +258,7 @@
                                     </div>
                                 </div>
                                 <div class="pt-3 border-t border-slate-800 flex justify-end space-x-2">
+                                    <button @click="openClientFile(client)" class="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-xs text-indigo-400 rounded-lg border border-indigo-500/30 transition">View File</button>
                                     <button @click="editClient(client)" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 rounded-lg transition">Edit</button>
                                     <button @click="deleteClient(client.id)" class="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-xs text-rose-400 rounded-lg transition">Delete</button>
                                 </div>
@@ -267,7 +272,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="text-lg font-bold text-slate-100">Service Desk Tickets</h3>
-                            <p class="text-xs text-slate-400">Track and resolve technical support issues for your managed clients.</p>
+                            <p class="text-xs text-slate-400">Track and resolve technical support issues for your managed clients. Click any ticket number or title to open its file.</p>
                         </div>
                         <button @click="openTicketModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-xl font-medium transition shadow-sm flex items-center space-x-2">
                             <i class="fa-solid fa-plus"></i>
@@ -290,8 +295,15 @@
                             <tbody class="divide-y divide-slate-800">
                                 <template x-for="t in tickets" :key="t.id">
                                     <tr class="hover:bg-slate-800/30">
-                                        <td class="p-4 font-mono text-xs text-indigo-400" x-text="'#MSP-' + t.id"></td>
-                                        <td class="p-4 font-medium text-slate-200" x-text="t.title"></td>
+                                        <td class="p-4 font-mono text-xs">
+                                            <button @click="openTicketFile(t)" class="text-indigo-400 hover:underline font-bold flex items-center space-x-1.5">
+                                                <i class="fa-solid fa-folder-open text-xs"></i>
+                                                <span x-text="'#MSP-' + t.id"></span>
+                                            </button>
+                                        </td>
+                                        <td class="p-4 font-medium text-slate-200">
+                                            <button @click="openTicketFile(t)" class="hover:text-indigo-400 text-left transition" x-text="t.title"></button>
+                                        </td>
                                         <td class="p-4 text-slate-300" x-text="t.client"></td>
                                         <td class="p-4">
                                             <span class="px-2.5 py-1 rounded-full text-xs font-semibold"
@@ -311,7 +323,8 @@
                                                 <option value="Closed">Closed</option>
                                             </select>
                                         </td>
-                                        <td class="p-4 text-right">
+                                        <td class="p-4 text-right space-x-2">
+                                            <button @click="openTicketFile(t)" class="text-indigo-400 hover:text-indigo-300 text-xs px-2 py-1"><i class="fa-solid fa-folder-open"></i></button>
                                             <button @click="deleteTicket(t.id)" class="text-rose-400 hover:text-rose-300 text-xs px-2 py-1"><i class="fa-solid fa-trash"></i></button>
                                         </td>
                                     </tr>
@@ -326,7 +339,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="text-lg font-bold text-slate-100">Sales Pipeline & 90-Day Follow-Up Engine</h3>
-                            <p class="text-xs text-slate-400">Automated follow-up sequences designed to close small business MSP contracts.</p>
+                            <p class="text-xs text-slate-400">Click any prospect name or company below to open their complete file and follow-up history.</p>
                         </div>
                         <button @click="openProspectModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-xl font-medium transition shadow-sm flex items-center space-x-2">
                             <i class="fa-solid fa-user-plus"></i>
@@ -340,8 +353,11 @@
                                 <div>
                                     <div class="flex items-start justify-between">
                                         <div>
-                                            <h4 class="font-bold text-slate-100 text-base" x-text="p.company"></h4>
-                                            <p class="text-xs text-slate-400" x-text="p.contactName + ' (' + p.email + ')'"></p>
+                                            <button @click="openProspectFile(p)" class="font-bold text-slate-100 hover:text-indigo-400 text-base text-left flex items-center space-x-2 transition">
+                                                <i class="fa-solid fa-folder-open text-xs text-indigo-400"></i>
+                                                <span x-text="p.company"></span>
+                                            </button>
+                                            <p class="text-xs text-slate-400 mt-0.5" x-text="p.contactName + ' (' + p.email + ')'"></p>
                                         </div>
                                         <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" x-text="p.stage"></span>
                                     </div>
@@ -364,9 +380,9 @@
                                 </div>
 
                                 <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
-                                    <button @click="previewEmail(p)" class="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-xs text-indigo-400 rounded-lg border border-indigo-500/30 transition flex items-center space-x-1.5">
-                                        <i class="fa-solid fa-envelope"></i>
-                                        <span>Send Template</span>
+                                    <button @click="openProspectFile(p)" class="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-xs text-indigo-400 rounded-lg border border-indigo-500/30 transition flex items-center space-x-1.5">
+                                        <i class="fa-solid fa-folder-open"></i>
+                                        <span>Open File</span>
                                     </button>
                                     <div class="flex space-x-1">
                                         <button @click="advanceProspectDay(p)" title="Advance 7 Days" class="px-2 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 rounded-lg transition">+7 Days</button>
@@ -631,6 +647,177 @@
         </div>
     </div>
 
+    <!-- PROSPECT FILE MODAL -->
+    <div x-show="prospectFileModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-xl p-6 space-y-5">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-indigo-600/20 text-indigo-400 p-2.5 rounded-xl border border-indigo-500/30">
+                        <i class="fa-solid fa-folder-open text-base"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-100 text-base" x-text="selectedProspect?.company"></h3>
+                        <p class="text-xs text-slate-400" x-text="'Prospect File & 90-Day Sequence History'"></p>
+                    </div>
+                </div>
+                <button @click="prospectFileModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="space-y-4 text-xs">
+                <div class="grid grid-cols-2 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
+                    <div>
+                        <span class="text-slate-400 block">Contact Name:</span>
+                        <span class="font-semibold text-slate-200 text-sm" x-text="selectedProspect?.contactName"></span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block">Email Address:</span>
+                        <span class="font-semibold text-indigo-400 text-sm" x-text="selectedProspect?.email"></span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block mt-2">Pipeline Stage:</span>
+                        <span class="px-2.5 py-1 inline-block mt-1 rounded-full font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" x-text="selectedProspect?.stage"></span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block mt-2">90-Day Plan Status:</span>
+                        <span class="font-bold text-amber-400 text-sm mt-1 inline-block" x-text="'Day ' + (selectedProspect?.dayInPlan || 1) + ' of 90'"></span>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block font-semibold text-slate-300">Active Automated Follow-Up Milestone</label>
+                    <div class="p-3.5 bg-slate-800/40 border border-slate-800 rounded-xl space-y-1.5 font-mono">
+                        <p class="text-[11px] font-bold text-indigo-400" x-text="selectedProspect ? getNextMilestoneTitle(selectedProspect.dayInPlan) : ''"></p>
+                        <p class="text-xs text-slate-300 whitespace-pre-wrap leading-relaxed" x-text="selectedProspect ? getProspectEmailBody(selectedProspect) : ''"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-3 border-t border-slate-800">
+                <div class="flex space-x-2">
+                    <button @click="advanceProspectDay(selectedProspect); saveData();" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 rounded-xl transition">+7 Days in Plan</button>
+                </div>
+                <div class="flex space-x-2">
+                    <button @click="prospectFileModal = false" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Close File</button>
+                    <button @click="previewEmail(selectedProspect); prospectFileModal = false;" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Send Template Email</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLIENT FILE MODAL -->
+    <div x-show="clientFileModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-xl p-6 space-y-5">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-emerald-600/20 text-emerald-400 p-2.5 rounded-xl border border-emerald-500/30">
+                        <i class="fa-solid fa-building-shield text-base"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-100 text-base" x-text="selectedClient?.name"></h3>
+                        <p class="text-xs text-slate-400" x-text="'Managed Client Agreement & Service History'"></p>
+                    </div>
+                </div>
+                <button @click="clientFileModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="space-y-4 text-xs">
+                <div class="grid grid-cols-2 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
+                    <div>
+                        <span class="text-slate-400 block">Primary Contact:</span>
+                        <span class="font-semibold text-slate-200 text-sm" x-text="selectedClient?.contactPerson"></span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block">Service Tier:</span>
+                        <span class="font-semibold text-emerald-400 text-sm" x-text="selectedClient?.tier"></span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block mt-2">Monthly MRR:</span>
+                        <span class="font-bold text-emerald-400 text-base mt-1 inline-block" x-text="formatCurrency(selectedClient?.mrr || 0)"></span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block mt-2">Agreement Renewal:</span>
+                        <span class="font-semibold text-slate-200 text-sm mt-1 inline-block" x-text="selectedClient?.renewalDate"></span>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block font-semibold text-slate-300">Active Support Tickets for Client</label>
+                    <div class="space-y-2 max-h-40 overflow-y-auto">
+                        <template x-for="t in tickets.filter(t => t.client === selectedClient?.name)" :key="t.id">
+                            <div class="p-3 bg-slate-800/40 border border-slate-800 rounded-xl flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs font-semibold text-slate-200" x-text="'#MSP-' + t.id + ': ' + t.title"></p>
+                                    <p class="text-[10px] text-slate-400" x-text="'Status: ' + t.status"></p>
+                                </div>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30" x-text="t.priority"></span>
+                            </div>
+                        </template>
+                        <div x-show="tickets.filter(t => t.client === selectedClient?.name).length === 0" class="p-3 text-center text-slate-500 bg-slate-950 rounded-xl border border-slate-800">
+                            No open support tickets for this client.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end pt-3 border-t border-slate-800 space-x-2">
+                <button @click="clientFileModal = false" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Close File</button>
+                <button @click="clientFileModal = false; editClient(selectedClient)" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Edit Agreement</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TICKET FILE MODAL -->
+    <div x-show="ticketFileModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-xl p-6 space-y-5">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-rose-600/20 text-rose-400 p-2.5 rounded-xl border border-rose-500/30">
+                        <i class="fa-solid fa-ticket text-base"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-100 text-base" x-text="'Ticket #MSP-' + (selectedTicket?.id || '')"></h3>
+                        <p class="text-xs text-slate-400" x-text="selectedTicket?.title"></p>
+                    </div>
+                </div>
+                <button @click="ticketFileModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="space-y-4 text-xs">
+                <div class="grid grid-cols-2 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
+                    <div>
+                        <span class="text-slate-400 block">Client Company:</span>
+                        <span class="font-semibold text-slate-200 text-sm" x-text="selectedTicket?.client"></span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block">Priority Level:</span>
+                        <span class="font-semibold text-rose-400 text-sm" x-text="selectedTicket?.priority"></span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block mt-2">Current Status:</span>
+                        <select x-model="selectedTicket.status" @change="saveData()" class="mt-1 bg-dark-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="Open">Open</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Waiting Client">Waiting Client</option>
+                            <option value="Resolved">Resolved</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block font-semibold text-slate-300">Issue Description / Resolution Log</label>
+                    <div class="p-3.5 bg-slate-800/40 border border-slate-800 rounded-xl space-y-1.5 font-mono text-xs text-slate-300">
+                        <p>Ticket logged for client infrastructure support. Standard SLA response time active.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end pt-3 border-t border-slate-800 space-x-2">
+                <button @click="ticketFileModal = false" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Done</button>
+            </div>
+        </div>
+    </div>
+
     <!-- EMAIL PREVIEW MODAL -->
     <div x-show="emailPreviewModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
         <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-lg p-6 space-y-4">
@@ -661,8 +848,14 @@
                 prospectModalOpen: false,
                 ticketModalOpen: false,
                 emailPreviewModal: false,
+                prospectFileModal: false,
+                clientFileModal: false,
+                ticketFileModal: false,
                 editingClient: null,
                 activeProspect: null,
+                selectedProspect: null,
+                selectedClient: null,
+                selectedTicket: null,
 
                 settings: {
                     companyName: 'Lake Conroe Managed Services',
@@ -726,6 +919,27 @@
                 getNextMilestoneTitle(day) {
                     const match = this.emailTemplates.slice().reverse().find(t => day >= t.day);
                     return match ? `Day ${match.day}: ${match.title}` : 'Initial Setup Phase';
+                },
+
+                openProspectFile(p) {
+                    this.selectedProspect = p;
+                    this.prospectFileModal = true;
+                },
+
+                openClientFile(c) {
+                    this.selectedClient = c;
+                    this.clientFileModal = true;
+                },
+
+                openTicketFile(t) {
+                    this.selectedTicket = t;
+                    this.ticketFileModal = true;
+                },
+
+                getProspectEmailBody(p) {
+                    if (!p) return '';
+                    const template = this.emailTemplates.slice().reverse().find(t => p.dayInPlan >= t.day) || this.emailTemplates[0];
+                    return template.body.replace(/\[Contact Name\]/g, p.contactName).replace(/\[Company Name\]/g, p.company);
                 },
 
                 openClientModal() {
