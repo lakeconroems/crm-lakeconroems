@@ -4,415 +4,296 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lake Conroe Managed Services - MSP Command Center</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        .sidebar {
+            background-color: #111827;
+            border-right: 1px solid #1f2937;
+        }
+        .card-bg {
+            background-color: #111827;
+            border: 1px solid #1f2937;
+        }
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(124, 58, 237, 0.15);
+            color: #a78bfa;
+            border-left: 4px solid #8b5cf6;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #7c3aed 0%, #a78bfa 100%);
+        }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans antialiased">
+<body class="min-h-screen flex flex-col md:flex-row">
 
-    <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar Navigation -->
-        <div class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col">
-            <div class="p-6 border-b border-slate-800">
-                <h1 class="text-base font-bold text-blue-400 flex items-center gap-2">
-                    <i class="fa-solid fa-server"></i> Lake Conroe Managed Services
-                </h1>
-                <p class="text-xs text-slate-400 mt-1">MSP Command Center</p>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar w-full md:w-64 flex-shrink-0 flex flex-col justify-between p-6">
+        <div>
+            <div class="flex items-center space-x-3 mb-8">
+                <div class="bg-purple-600 p-2.5 rounded-xl text-white shadow-lg shadow-purple-900/50">
+                    <i class="fa-solid fa-server text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm tracking-wide text-white">Lake Conroe Managed Services</h1>
+                    <p class="text-xs text-purple-400 font-medium">MSP Command Center</p>
+                </div>
             </div>
-            <nav class="flex-1 p-4 space-y-1.5 overflow-y-auto">
-                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 transition">
-                    <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
-                </button>
-                <button onclick="switchTab('clients')" id="nav-clients" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
-                    <i class="fa-solid fa-building-user w-5"></i> Managed Clients
-                </button>
-                <button onclick="switchTab('servicedesk')" id="nav-servicedesk" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
-                    <i class="fa-solid fa-headset w-5"></i> Service Desk
-                </button>
-                <button onclick="switchTab('pipeline')" id="nav-pipeline" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
-                    <i class="fa-solid fa-chart-line w-5"></i> Sales Pipeline
-                </button>
-                <button onclick="switchTab('templates')" id="nav-templates" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
-                    <i class="fa-solid fa-envelope-open-text w-5"></i> 90-Day Templates
-                </button>
-                <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition">
-                    <i class="fa-solid fa-gear w-5"></i> Settings & Setups
-                </button>
+
+            <nav class="space-y-1">
+                <a href="#" class="nav-item active flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors">
+                    <i class="fa-solid fa-chart-pie w-5"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-building-user w-5"></i>
+                    <span>Managed Clients</span>
+                </a>
+                <a href="#" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-headset w-5"></i>
+                    <span>Service Desk</span>
+                </a>
+                <a href="#" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-chart-line w-5"></i>
+                    <span>Sales Pipeline</span>
+                </a>
+                <a href="#" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-envelope-open-text w-5"></i>
+                    <span>90-Day Templates</span>
+                </a>
+                <a href="#" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-gears w-5"></i>
+                    <span>Settings & Setups</span>
+                </a>
             </nav>
-            <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
-                crm.lakeconroems.com
+        </div>
+
+        <div class="pt-6 border-t border-gray-800 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-full bg-purple-900/60 border border-purple-500/30 flex items-center justify-center font-bold text-purple-300 text-sm">
+                    LC
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-white">MSP Director</p>
+                    <p class="text-[10px] text-gray-400">admin@lakeconroems.com</p>
+                </div>
+            </div>
+            <button class="text-gray-400 hover:text-white transition-colors" title="Settings">
+                <i class="fa-solid fa-gear"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+        <header class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-bold tracking-tight text-white">Dashboard</h2>
+            <div id="toast" class="hidden bg-emerald-600/90 text-emerald-100 text-xs px-4 py-2 rounded-lg shadow-lg border border-emerald-500/30 transition-all">
+                <i class="fa-solid fa-check-circle mr-1.5"></i> <span id="toast-msg">Template triggered successfully!</span>
+            </div>
+        </header>
+
+        <!-- Top Metrics Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="card-bg p-5 rounded-2xl shadow-sm">
+                <div class="flex justify-between items-start mb-3">
+                    <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Total Monthly MRR</span>
+                    <i class="fa-solid fa-chart-line text-purple-400"></i>
+                </div>
+                <div class="text-2xl font-bold text-white mb-1">$0</div>
+                <p class="text-xs text-emerald-400 font-medium flex items-center">
+                    <i class="fa-solid fa-arrow-trend-up mr-1"></i> Active recurring agreements
+                </p>
+            </div>
+
+            <div class="card-bg p-5 rounded-2xl shadow-sm">
+                <div class="flex justify-between items-start mb-3">
+                    <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Active Prospects</span>
+                    <i class="fa-solid fa-bullseye text-amber-400"></i>
+                </div>
+                <div class="text-2xl font-bold text-white mb-1">1</div>
+                <p class="text-xs text-gray-400 font-medium">0 proposals pending</p>
+            </div>
+
+            <div class="card-bg p-5 rounded-2xl shadow-sm">
+                <div class="flex justify-between items-start mb-3">
+                    <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Open Support Tickets</span>
+                    <i class="fa-solid fa-ticket text-rose-400"></i>
+                </div>
+                <div class="text-2xl font-bold text-white mb-1">0</div>
+                <p class="text-xs text-rose-400 font-medium">0 critical priority</p>
+            </div>
+
+            <div class="card-bg p-5 rounded-2xl shadow-sm">
+                <div class="flex justify-between items-start mb-3">
+                    <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Active MSP Clients</span>
+                    <i class="fa-solid fa-shield-halved text-cyan-400"></i>
+                </div>
+                <div class="text-2xl font-bold text-white mb-1">0</div>
+                <p class="text-xs text-cyan-400 font-medium">100% SLA compliant</p>
             </div>
         </div>
 
-        <!-- Main Content Wrapper -->
-        <div class="flex-1 flex flex-col overflow-y-auto bg-slate-950">
-            <!-- Top Navbar -->
-            <header class="bg-slate-900 border-b border-slate-800 px-8 py-4 flex justify-between items-center">
-                <h2 id="page-title" class="text-lg font-semibold text-white">Dashboard</h2>
-                <div class="flex items-center gap-4">
-                    <button onclick="refreshData()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3.5 py-2 rounded-lg flex items-center gap-2 border border-slate-700 transition">
-                        <i class="fa-solid fa-rotate"></i> Refresh Data
-                    </button>
-                    <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs text-white">
-                        LC
-                    </div>
-                </div>
-            </header>
+        <!-- Main Workspace Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left 2 Cols: Sales Pipeline & Follow-Up Engine -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Engine Banner -->
+                <div class="card-bg p-6 rounded-2xl border border-purple-500/20 bg-gradient-to-br from-purple-950/20 to-transparent">
+                    <h3 class="text-lg font-bold text-white mb-1">Sales Pipeline & 90-Day Follow-Up Engine</h3>
+                    <p class="text-xs text-gray-400 mb-6">Aggressive automated follow-up sequences designed to close small business MSP contracts.</p>
 
-            <main class="p-8 space-y-6">
-
-                <!-- 1. DASHBOARD VIEW -->
-                <div id="view-dashboard" class="space-y-6">
-                    <!-- KPI Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl relative overflow-hidden">
-                            <div class="text-xs text-slate-400 font-medium">TOTAL MONTHLY MRR</div>
-                            <div class="text-2xl font-bold mt-2 text-white">$0</div>
-                            <div class="text-xs text-emerald-400 mt-1 flex items-center gap-1"><i class="fa-solid fa-arrow-trend-up"></i> Active recurring agreements</div>
-                        </div>
-                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl relative overflow-hidden">
-                            <div class="text-xs text-slate-400 font-medium">ACTIVE PROSPECTS</div>
-                            <div class="text-2xl font-bold mt-2 text-white" id="kpi-lead-count">0</div>
-                            <div class="text-xs text-amber-400 mt-1">0 proposals pending</div>
-                        </div>
-                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl relative overflow-hidden">
-                            <div class="text-xs text-slate-400 font-medium">OPEN SUPPORT TICKETS</div>
-                            <div class="text-2xl font-bold mt-2 text-white" id="kpi-ticket-count">0</div>
-                            <div class="text-xs text-blue-400 mt-1">Live queue sync</div>
-                        </div>
-                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl relative overflow-hidden">
-                            <div class="text-xs text-slate-400 font-medium">ACTIVE MSP CLIENTS</div>
-                            <div class="text-2xl font-bold mt-2 text-white">0</div>
-                            <div class="text-xs text-indigo-400 mt-1">100% SLA compliant</div>
-                        </div>
-                    </div>
-
-                    <!-- Pipeline & Service Desk Split Grid -->
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- Sales Pipeline Engine Preview -->
-                        <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <h3 class="font-semibold text-white">Sales Pipeline & 90-Day Follow-Up Engine</h3>
-                                    <p class="text-xs text-slate-400 mt-0.5">Automated follow-up sequences designed to close small business MSP contracts.</p>
-                                </div>
-                                <button onclick="switchTab('pipeline')" class="text-xs text-blue-400 hover:underline">View All Leads</button>
-                            </div>
-                            <div id="dashboard-lead-container" class="space-y-3">
-                                <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl text-center text-xs text-slate-500">Loading active pipeline leads...</div>
-                            </div>
-                        </div>
-
-                        <!-- Service Desk Quick View -->
-                        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 flex flex-col">
+                    <!-- Active Lead Card (Test1) -->
+                    <div id="lead-card" class="bg-gray-900/80 border border-gray-800 rounded-xl p-5 shadow-md relative">
+                        <div class="flex justify-between items-start mb-3">
                             <div>
-                                <h3 class="font-semibold text-white">Service Desk Overview</h3>
-                                <p class="text-xs text-slate-400 mt-0.5">Inbound support requests from M365.</p>
+                                <h4 class="text-base font-bold text-white">Test1</h4>
+                                <p class="text-xs text-gray-400">Test1 (brian@lakeconroems.com)</p>
                             </div>
-                            <div id="dashboard-ticket-container" class="flex-1 space-y-2 overflow-y-auto max-h-64">
-                                <div class="p-4 rounded-xl border border-dashed border-slate-800 text-center text-xs text-slate-500">
-                                    No active support tickets found in your SharePoint 'Tickets' list.
-                                </div>
-                            </div>
+                            <span class="px-3 py-1 bg-purple-900/40 text-purple-300 border border-purple-500/30 text-xs font-semibold rounded-full">New Lead</span>
                         </div>
-                    </div>
-                </div>
 
-                <!-- 2. MANAGED CLIENTS VIEW -->
-                <div id="view-clients" class="space-y-6 hidden">
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                        <h3 class="font-semibold text-white mb-2">Managed Clients Directory</h3>
-                        <p class="text-xs text-slate-400 mb-6">Manage client organizations, agreement types, and asset inventory.</p>
-                        <div class="p-12 text-center text-slate-500 border border-dashed border-slate-800 rounded-xl text-sm">
-                            Client management module ready for onboarding.
+                        <div class="mb-4">
+                            <div class="flex justify-between text-xs font-semibold mb-1.5">
+                                <span class="text-gray-300">90-Day Follow-Up Plan:</span>
+                                <span class="text-purple-400" id="day-counter">Day 43 / 90</span>
+                            </div>
+                            <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
+                                <div id="progress-fill" class="progress-bar h-full rounded-full transition-all duration-300" style="width: 47.7%;"></div>
+                            </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- 3. SERVICE DESK / TICKETS VIEW -->
-                <div id="view-servicedesk" class="space-y-6 hidden">
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-                        <div class="px-6 py-5 border-b border-slate-800 flex justify-between items-center">
-                            <div>
-                                <h3 class="font-semibold text-white">Live Support Queue</h3>
-                                <p class="text-xs text-slate-400 mt-0.5">Real-time incoming emails synced from SharePoint.</p>
-                            </div>
-                            <span id="full-ticket-count" class="text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full font-medium">0 Active</span>
+                        <!-- Current Automated Template Box -->
+                        <div class="bg-gray-950/60 border border-gray-800 rounded-lg p-4 mb-4">
+                            <span class="text-[10px] uppercase font-bold tracking-wider text-purple-400 block mb-1">Current Automated Template</span>
+                            <p id="template-title" class="text-sm font-semibold text-white">Day 30: Custom MSP Service Proposal</p>
                         </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-slate-950/50 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-800">
-                                        <th class="px-6 py-3.5">Subject</th>
-                                        <th class="px-6 py-3.5">Client Email</th>
-                                        <th class="px-6 py-3.5">Description</th>
-                                        <th class="px-6 py-3.5">Received</th>
-                                        <th class="px-6 py-3.5">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="ticketTableBody" class="divide-y divide-slate-800 text-sm">
-                                    <tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">Loading support queue...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- 4. SALES PIPELINE VIEW -->
-                <div id="view-pipeline" class="space-y-6 hidden">
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-                        <div class="px-6 py-5 border-b border-slate-800 flex justify-between items-center">
-                            <div>
-                                <h3 class="font-semibold text-white">Outbound Sales Sequences</h3>
-                                <p class="text-xs text-slate-400 mt-0.5">Manage prospects and trigger 90-day follow-up templates.</p>
-                            </div>
-                            <span id="full-lead-count" class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full font-medium">0 Leads</span>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-slate-950/50 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-800">
-                                        <th class="px-6 py-3.5">Company / Name</th>
-                                        <th class="px-6 py-3.5">Email</th>
-                                        <th class="px-6 py-3.5">Sequence Stage</th>
-                                        <th class="px-6 py-3.5 text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="leadTableBody" class="divide-y divide-slate-800 text-sm">
-                                    <tr><td colspan="4" class="px-6 py-8 text-center text-slate-500">Loading sales pipeline...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 5. 90-DAY TEMPLATES VIEW -->
-                <div id="view-templates" class="space-y-6 hidden">
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                        <h3 class="font-semibold text-white mb-2">90-Day Outbound Email Templates</h3>
-                        <p class="text-xs text-slate-400 mb-6">Preview and customize sequence cadence for small business outreach.</p>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl">
-                                <span class="text-xs text-indigo-400 font-semibold">Day 1</span>
-                                <h4 class="font-medium text-white text-sm mt-1">Introduction & Value Prop</h4>
-                                <p class="text-xs text-slate-400 mt-2">Initial outreach focusing on network uptime and security for local businesses.</p>
-                            </div>
-                            <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl">
-                                <span class="text-xs text-indigo-400 font-semibold">Day 30</span>
-                                <h4 class="font-medium text-white text-sm mt-1">Custom MSP Service Proposal</h4>
-                                <p class="text-xs text-slate-400 mt-2">Breakdown of managed security, backup solutions, and support response times.</p>
-                            </div>
-                            <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl">
-                                <span class="text-xs text-indigo-400 font-semibold">Day 90</span>
-                                <h4 class="font-medium text-white text-sm mt-1">Final Quarter Check-in</h4>
-                                <p class="text-xs text-slate-400 mt-2">Last touchpoint offering a free IT infrastructure assessment.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 6. SETTINGS & SETUPS VIEW -->
-                <div id="view-settings" class="space-y-6 hidden">
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-                        <h3 class="font-semibold text-white">SharePoint & M365 Integration Settings</h3>
-                        <p class="text-xs text-slate-400">Configure your SharePoint site endpoint to connect your data sources.</p>
-                        <div class="pt-2 max-w-xl space-y-3">
-                            <label class="block text-xs font-medium text-slate-300">SharePoint Site URL</label>
-                            <input type="text" id="siteUrlInput" value="https://lakeconroems.sharepoint.com/sites/CRM" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
-                            <button onclick="refreshData()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-xl font-medium transition shadow">
-                                Save & Test Connection
+                        <!-- Action Buttons -->
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+                            <button onclick="sendTemplateEmail()" class="bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition-colors flex items-center space-x-2 shadow-lg shadow-purple-900/40 cursor-pointer">
+                                <i class="fa-solid fa-envelope"></i>
+                                <span>Send Template</span>
                             </button>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="advanceDays()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-semibold px-3 py-2.5 rounded-lg transition-colors border border-gray-700 cursor-pointer">
+                                    +7 Days
+                                </button>
+                                <button onclick="deleteLead()" class="bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 text-xs p-2.5 rounded-lg transition-colors border border-rose-900/40 cursor-pointer" title="Delete Lead">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-            </main>
+                <!-- Active Sales Prospects Table -->
+                <div class="card-bg rounded-2xl overflow-hidden shadow-sm">
+                    <div class="p-5 border-b border-gray-800 flex justify-between items-center">
+                        <h4 class="font-bold text-white text-sm">Active Sales Prospects (90-Day Plan)</h4>
+                        <span class="text-xs text-purple-400 hover:underline cursor-pointer">View All</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-gray-900/50 text-gray-400 uppercase font-semibold">
+                                <tr>
+                                    <th class="px-5 py-3">Prospect / Company</th>
+                                    <th class="px-5 py-3">Stage</th>
+                                    <th class="px-5 py-3">Day in Plan</th>
+                                    <th class="px-5 py-3">Next Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-800/60 text-gray-300">
+                                <tr class="hover:bg-gray-900/30">
+                                    <td class="px-5 py-4 font-semibold text-white">Test1</td>
+                                    <td class="px-5 py-4"><span class="px-2.5 py-1 bg-purple-900/40 text-purple-300 rounded-full border border-purple-500/20">New Lead</span></td>
+                                    <td class="px-5 py-4 text-purple-400 font-semibold" id="table-day">Day 43 / 90</td>
+                                    <td class="px-5 py-4 text-gray-400" id="table-action">Day 30: Custom MSP Service Proposal</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Col: Service Desk Overview -->
+            <div>
+                <div class="card-bg rounded-2xl p-5 shadow-sm h-full flex flex-col justify-between">
+                    <div>
+                        <h4 class="font-bold text-white text-sm mb-4">Service Desk Overview</h4>
+                        <div class="border-2 border-dashed border-gray-800 rounded-xl p-8 text-center flex flex-col items-center justify-center space-y-3">
+                            <div class="w-12 h-12 rounded-full bg-gray-900 flex items-center justify-center text-gray-600">
+                                <i class="fa-solid fa-headset text-lg"></i>
+                            </div>
+                            <p class="text-xs text-gray-400">No active support tickets found in your `Tickets` SharePoint list.</p>
+                        </div>
+                    </div>
+                    <div class="pt-6">
+                        <button class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-semibold py-3 rounded-xl transition-colors border border-gray-700 flex items-center justify-center space-x-2 cursor-pointer">
+                            <i class="fa-solid fa-ticket"></i>
+                            <span>Open Helpdesk Board</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
         </div>
-    </div>
+    </main>
 
+    <!-- JavaScript Handler for SharePoint / Power Automate integration -->
     <script>
-        function switchTab(tabId) {
-            const tabs = ['dashboard', 'clients', 'servicedesk', 'pipeline', 'templates', 'settings'];
-            tabs.forEach(t => {
-                const view = document.getElementById(`view-${t}`);
-                const nav = document.getElementById(`nav-${t}`);
-                if (view) view.classList.add('hidden');
-                if (nav) {
-                    nav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition";
-                }
-            });
+        let currentDay = 43;
 
-            const activeView = document.getElementById(`view-${tabId}`);
-            const activeNav = document.getElementById(`nav-${tabId}`);
-            if (activeView) activeView.classList.remove('hidden');
-            if (activeNav) {
-                activeNav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 transition";
-            }
-
-            const titles = {
-                'dashboard': 'Dashboard',
-                'clients': 'Managed Clients Directory',
-                'servicedesk': 'Service Desk Queue',
-                'pipeline': 'Sales Pipeline',
-                'templates': '90-Day Templates',
-                'settings': 'Settings & Setups'
-            };
-            document.getElementById('page-title').innerText = titles[tabId] || 'Dashboard';
-
-            if (tabId === 'dashboard' || tabId === 'servicedesk' || tabId === 'pipeline') {
-                refreshData();
-            }
-        }
-
-        function refreshData() {
-            loadTickets();
-            loadLeads();
-        }
-
-        async function loadTickets() {
-            const siteUrl = document.getElementById('siteUrlInput').value.trim();
-            const endpoint = `${siteUrl}/_api/web/lists/getbytitle('Tickets')/items?$select=Id,Title,Client,Description,Created&$orderby=Created desc`;
+        async function sendTemplateEmail() {
+            const templateName = document.getElementById('template-title').innerText;
             
+            // Show success notification badge
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = `Triggered: ${templateName} sent to brian@lakeconroems.com`;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 4000);
+
+            // SharePoint & Power Automate Integration Hook
             try {
-                const response = await fetch(endpoint, { headers: { "Accept": "application/json;odata=verbose" } });
-                const data = await response.json();
-                const tickets = data.d.results;
-
-                document.getElementById('kpi-ticket-count').innerText = tickets.length;
-                document.getElementById('full-ticket-count').innerText = `${tickets.length} Active`;
-
-                let tableHtml = "";
-                let dashHtml = "";
-
-                if (tickets.length === 0) {
-                    tableHtml = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">No support tickets found in SharePoint.</td></tr>`;
-                    dashHtml = `<div class="p-4 rounded-xl border border-dashed border-slate-800 text-center text-xs text-slate-500">No active support tickets found.</div>`;
-                } else {
-                    tickets.forEach(t => {
-                        const dateFormatted = new Date(t.Created).toLocaleString();
-                        tableHtml += `
-                            <tr class="hover:bg-slate-800/50 transition">
-                                <td class="px-6 py-4 font-medium text-white">${t.Title || 'Untitled'}</td>
-                                <td class="px-6 py-4 text-slate-300">${t.Client || 'Unknown'}</td>
-                                <td class="px-6 py-4 text-slate-400 max-w-xs truncate">${t.Description || ''}</td>
-                                <td class="px-6 py-4 text-slate-400 text-xs">${dateFormatted}</td>
-                                <td class="px-6 py-4"><span class="px-2.5 py-1 text-xs rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">Open</span></td>
-                            </tr>
-                        `;
-                        dashHtml += `
-                            <div class="bg-slate-950 border border-slate-800 p-3.5 rounded-xl flex justify-between items-center">
-                                <div>
-                                    <div class="font-medium text-xs text-white">${t.Title}</div>
-                                    <div class="text-xs text-slate-400 mt-0.5">${t.Client || 'Unknown Client'}</div>
-                                </div>
-                                <span class="px-2 py-0.5 text-xs rounded-full bg-blue-500/10 text-blue-400">Open</span>
-                            </div>
-                        `;
-                    });
-                }
-                document.getElementById('ticketTableBody').innerHTML = tableHtml;
-                document.getElementById('dashboard-ticket-container').innerHTML = dashHtml;
-            } catch (error) {
-                console.error("Error fetching tickets:", error);
-            }
-        }
-
-        async function loadLeads() {
-            const siteUrl = document.getElementById('siteUrlInput').value.trim();
-            const endpoint = `${siteUrl}/_api/web/lists/getbytitle('Leads')/items?$select=Id,Title,ClientEmail,SequenceStage,TriggerEmail&$orderby=Modified desc`;
-            
-            try {
-                const response = await fetch(endpoint, { headers: { "Accept": "application/json;odata=verbose" } });
-                const data = await response.json();
-                const leads = data.d.results;
-
-                document.getElementById('kpi-lead-count').innerText = leads.length;
-                document.getElementById('full-lead-count').innerText = `${leads.length} Leads`;
-
-                let tableHtml = "";
-                let dashHtml = "";
-
-                if (leads.length === 0) {
-                    tableHtml = `<tr><td colspan="4" class="px-6 py-8 text-center text-slate-500">No leads found in SharePoint.</td></tr>`;
-                    dashHtml = `<div class="bg-slate-950 border border-slate-800 p-4 rounded-xl text-center text-xs text-slate-500">No active pipeline leads found.</div>`;
-                } else {
-                    leads.forEach(l => {
-                        tableHtml += `
-                            <tr class="hover:bg-slate-800/50 transition">
-                                <td class="px-6 py-4 font-medium text-white">${l.Title || 'Untitled Lead'}</td>
-                                <td class="px-6 py-4 text-slate-300">${l.ClientEmail || 'No Email'}</td>
-                                <td class="px-6 py-4 text-slate-400">${l.SequenceStage || 'Initial Touch'}</td>
-                                <td class="px-6 py-4 text-right">
-                                    <button onclick="triggerLeadEmail(${l.Id}, '${siteUrl}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition shadow">
-                                        <i class="fa-solid fa-paper-plane mr-1"></i> Send Template
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
-                        dashHtml += `
-                            <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-3">
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <div class="font-medium text-white text-sm">${l.Title}</div>
-                                        <div class="text-xs text-slate-400">${l.ClientEmail || 'No Email'}</div>
-                                    </div>
-                                    <span class="text-xs bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2.5 py-1 rounded-full font-medium">Active Lead</span>
-                                </div>
-                                <div class="flex justify-between items-center pt-2 border-t border-slate-900">
-                                    <span class="text-xs text-slate-400">Stage: ${l.SequenceStage || 'Initial Touch'}</span>
-                                    <button onclick="triggerLeadEmail(${l.Id}, '${siteUrl}')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5">
-                                        <i class="fa-solid fa-paper-plane"></i> Send Template
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-                document.getElementById('leadTableBody').innerHTML = tableHtml;
-                document.getElementById('dashboard-lead-container').innerHTML = dashHtml;
-            } catch (error) {
-                console.error("Error fetching leads:", error);
-            }
-        }
-
-        async function triggerLeadEmail(leadId, siteUrl) {
-            const endpoint = `${siteUrl}/_api/web/lists/getbytitle('Leads')/items(${leadId})`;
-            try {
-                const digestRes = await fetch(`${siteUrl}/_api/contextinfo`, {
-                    method: 'POST',
-                    headers: { "Accept": "application/json;odata=verbose" }
-                });
-                const digestData = await digestRes.json();
-                const formDigest = digestData.d.GetContextWebInformation.FormDigestValue;
-
-                const updateRes = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        "Accept": "application/json;odata=verbose",
-                        "Content-Type": "application/json;odata=verbose",
-                        "X-RequestDigest": formDigest,
-                        "X-HTTP-Method": "MERGE",
-                        "IF-MATCH": "*"
-                    },
-                    body: JSON.stringify({
-                        '__metadata': { 'type': 'SP.Data.LeadsListItem' },
-                        'TriggerEmail': 'Yes'
+                /*
+                // Uncomment below when connected to your live SharePoint site
+                await fetch(`https://your-sharepoint-site/_api/web/lists/getbytitle('Leads')/items(1)`, {
+                    method: 'MERGE',
+                    headers: { 'Content-Type': 'application/json', 'IF-MATCH': '*' },
+                    body: JSON.stringify({ 
+                        TriggerEmail: 'Yes', 
+                        ActiveTemplate: templateName 
                     })
                 });
-
-                if (updateRes.ok || updateRes.status === 204) {
-                    alert("Outbound template triggered successfully! Power Automate is dispatching the email.");
-                    setTimeout(refreshData, 2000);
-                } else {
-                    alert("Failed to trigger email. Check list column internal names.");
-                }
-            } catch (err) {
-                console.error("Trigger error:", err);
-                alert("Error triggering sequence. Ensure you are logged into your M365 session.");
+                */
+                console.log("Power Automate trigger signal sent for template:", templateName);
+            } catch (error) {
+                console.error("Error triggering automation:", error);
             }
         }
 
-        // Initialize on load
-        window.onload = refreshData;
+        function advanceDays() {
+            currentDay = Math.min(90, currentDay + 7);
+            document.getElementById('day-counter').innerText = `Day ${currentDay} / 90`;
+            document.getElementById('table-day').innerText = `Day ${currentDay} / 90`;
+            let percent = (currentDay / 90) * 100;
+            document.getElementById('progress-fill').style.width = `${percent}%`;
+        }
+
+        function deleteLead() {
+            if(confirm("Are you sure you want to remove this test lead?")) {
+                document.getElementById('lead-card').style.opacity = '0.3';
+                alert("Lead archived.");
+            }
+        }
     </script>
 </body>
 </html>
