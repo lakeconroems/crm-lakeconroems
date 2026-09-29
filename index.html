@@ -101,9 +101,9 @@
 
                 <!-- 1. DASHBOARD TAB -->
                 <div x-show="currentTab === 'dashboard'" class="space-y-6">
-                    <!-- KPI Cards -->
+                    <!-- KPI Cards (All Clickable to respective sections) -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <!-- Clickable Total MRR Card -->
+                        <!-- Total MRR Card -->
                         <div @click="currentTab = 'clients'" class="bg-dark-900 border border-slate-800 p-5 rounded-2xl shadow-sm cursor-pointer hover:border-indigo-500/50 transition group">
                             <div class="flex items-center justify-between text-slate-400 mb-2">
                                 <span class="text-xs font-medium uppercase tracking-wider group-hover:text-indigo-400 transition">Total Monthly MRR</span>
@@ -116,35 +116,43 @@
                             </div>
                         </div>
 
-                        <div class="bg-dark-900 border border-slate-800 p-5 rounded-2xl shadow-sm">
+                        <!-- Active Sales Prospects Card -->
+                        <div @click="currentTab = 'prospects'" class="bg-dark-900 border border-slate-800 p-5 rounded-2xl shadow-sm cursor-pointer hover:border-indigo-500/50 transition group">
                             <div class="flex items-center justify-between text-slate-400 mb-2">
-                                <span class="text-xs font-medium uppercase tracking-wider">Active Prospects</span>
+                                <span class="text-xs font-medium uppercase tracking-wider group-hover:text-indigo-400 transition">Active Sales Prospects</span>
                                 <i class="fa-solid fa-bullseye text-amber-400"></i>
                             </div>
                             <div class="text-2xl font-bold text-slate-100" x-text="prospects.length"></div>
-                            <div class="text-xs text-slate-400 mt-2">
-                                <span x-text="prospects.filter(p => p.stage === 'Proposal Sent').length"></span> proposals pending
+                            <div class="text-xs text-amber-400 mt-2 flex items-center space-x-1">
+                                <i class="fa-solid fa-arrow-pointer"></i>
+                                <span><span x-text="prospects.filter(p => p.stage === 'Proposal Sent').length"></span> proposals pending (Click to view)</span>
                             </div>
                         </div>
 
-                        <div class="bg-dark-900 border border-slate-800 p-5 rounded-2xl shadow-sm">
+                        <!-- Open Support Tickets Card -->
+                        <div @click="currentTab = 'tickets'" class="bg-dark-900 border border-slate-800 p-5 rounded-2xl shadow-sm cursor-pointer hover:border-indigo-500/50 transition group">
                             <div class="flex items-center justify-between text-slate-400 mb-2">
-                                <span class="text-xs font-medium uppercase tracking-wider">Open Support Tickets</span>
+                                <span class="text-xs font-medium uppercase tracking-wider group-hover:text-indigo-400 transition">Open Support Tickets</span>
                                 <i class="fa-solid fa-ticket text-rose-400"></i>
                             </div>
                             <div class="text-2xl font-bold text-slate-100" x-text="tickets.filter(t => t.status !== 'Closed').length"></div>
-                            <div class="text-xs text-rose-400 mt-2">
-                                <span x-text="tickets.filter(t => t.priority === 'Critical' && t.status !== 'Closed').length"></span> critical priority
+                            <div class="text-xs text-rose-400 mt-2 flex items-center space-x-1">
+                                <i class="fa-solid fa-arrow-pointer"></i>
+                                <span><span x-text="tickets.filter(t => t.priority === 'Critical' && t.status !== 'Closed').length"></span> critical priority (Click to view)</span>
                             </div>
                         </div>
 
-                        <div class="bg-dark-900 border border-slate-800 p-5 rounded-2xl shadow-sm">
+                        <!-- Active MSP Clients Card -->
+                        <div @click="currentTab = 'clients'" class="bg-dark-900 border border-slate-800 p-5 rounded-2xl shadow-sm cursor-pointer hover:border-indigo-500/50 transition group">
                             <div class="flex items-center justify-between text-slate-400 mb-2">
-                                <span class="text-xs font-medium uppercase tracking-wider">Active MSP Clients</span>
+                                <span class="text-xs font-medium uppercase tracking-wider group-hover:text-indigo-400 transition">Active MSP Clients</span>
                                 <i class="fa-solid fa-building-shield text-emerald-400"></i>
                             </div>
                             <div class="text-2xl font-bold text-slate-100" x-text="clients.length"></div>
-                            <div class="text-xs text-emerald-400 mt-2">100% SLA target compliant</div>
+                            <div class="text-xs text-emerald-400 mt-2 flex items-center space-x-1">
+                                <i class="fa-solid fa-arrow-pointer"></i>
+                                <span>100% SLA target compliant (Click to view)</span>
+                            </div>
                         </div>
                     </div>
 
