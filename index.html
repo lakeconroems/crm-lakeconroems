@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lake Conroe Managed Services - MSP Command Center</title>
+    <title>Lake Conroe Managed Services - MSP CRM & Sales Suite</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -29,7 +29,7 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-dark-950 text-gray-100 min-h-screen font-sans antialiased" x-data="mspSharePointCRM()">
+<body class="bg-dark-950 text-gray-100 min-h-screen font-sans antialiased" x-data="mspCRM()">
 
     <div class="flex h-screen overflow-hidden">
         
@@ -42,8 +42,8 @@
                         <i class="fa-solid fa-server text-lg"></i>
                     </div>
                     <div>
-                        <h1 class="font-bold text-sm tracking-wide text-indigo-400">Lake Conroe MSP</h1>
-                        <p class="text-xs text-slate-400">SharePoint / Power Automate</p>
+                        <h1 class="font-bold text-sm tracking-wide text-indigo-400" x-text="settings.companyName"></h1>
+                        <p class="text-xs text-slate-400">MSP Command Center</p>
                     </div>
                 </div>
 
@@ -60,17 +60,19 @@
                 </nav>
             </div>
 
-            <!-- User Footer / Sync Status -->
+            <!-- User Footer -->
             <div class="p-4 border-t border-slate-800 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <div class="w-3 h-3 rounded-full" :class="isOnline ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'"></div>
+                    <div class="w-9 h-9 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-sm border border-indigo-500/30">
+                        LC
+                    </div>
                     <div class="overflow-hidden">
-                        <p class="text-xs font-semibold text-slate-200" x-text="isOnline ? 'SharePoint Connected' : 'Offline Mock Mode'"></p>
-                        <p class="text-[10px] text-slate-400">Auto-Sync Active</p>
+                        <p class="text-xs font-semibold text-slate-200 truncate" x-text="settings.adminName"></p>
+                        <p class="text-[10px] text-slate-400 truncate" x-text="settings.adminEmail"></p>
                     </div>
                 </div>
-                <button @click="fetchAllSharePointData()" title="Sync Now" class="text-slate-400 hover:text-white transition">
-                    <i class="fa-solid fa-rotate"></i>
+                <button @click="currentTab = 'settings'" class="text-slate-400 hover:text-white transition">
+                    <i class="fa-solid fa-gear"></i>
                 </button>
             </div>
         </aside>
@@ -81,12 +83,15 @@
             <!-- Top Header Bar -->
             <header class="h-16 bg-dark-900 border-b border-slate-800 flex items-center justify-between px-6 z-10">
                 <div class="flex items-center space-x-4">
+                    <div class="md:hidden">
+                        <span class="text-indigo-400 font-bold" x-text="settings.companyName"></span>
+                    </div>
                     <h2 class="text-lg font-semibold text-slate-100 capitalize" x-text="tabs.find(t => t.id === currentTab)?.name || 'Dashboard'"></h2>
                 </div>
                 <div class="flex items-center space-x-3">
-                    <button @click="fetchAllSharePointData()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-2 rounded-lg font-medium transition flex items-center space-x-2">
-                        <i class="fa-solid fa-cloud-arrow-down"></i>
-                        <span>Refresh SP Data</span>
+                    <button @click="quickActionModal = true" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2 rounded-lg font-medium transition shadow-sm flex items-center space-x-2">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Quick Add</span>
                     </button>
                 </div>
             </header>
@@ -96,41 +101,106 @@
 
                 <!-- 1. DASHBOARD TAB -->
                 <div x-show="currentTab === 'dashboard'" class="space-y-6">
+                    <!-- KPI Cards -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="bg-dark-900 border border-slate-800 p-5 rounded-2xl">
+                        <div class="bg-dark-900 border border-slate-800 p-5 rounded-2xl shadow-sm">
                             <div class="flex items-center justify-between text-slate-400 mb-2">
-                                <span class="text-xs font-medium uppercase tracking-wider">Total MRR</span>
+                                <span class="text-xs font-medium uppercase tracking-wider">Total Monthly MRR</span>
                                 <i class="fa-solid fa-chart-line text-indigo-400"></i>
                             </div>
                             <div class="text-2xl font-bold text-slate-100" x-text="formatCurrency(totalMRR())"></div>
-                            <div class="text-xs text-emerald-400 mt-2">Active SharePoint Agreements</div>
+                            <div class="text-xs text-emerald-400 mt-2 flex items-center space-x-1">
+                                <i class="fa-solid fa-arrow-trend-up"></i>
+                                <span>Active recurring agreements</span>
+                            </div>
                         </div>
 
-                        <div class="bg-dark-900 border border-slate-800 p-5 rounded-2xl">
+                        <div class="bg-dark-900 border border-slate-800 p-5 rounded-2xl shadow-sm">
                             <div class="flex items-center justify-between text-slate-400 mb-2">
                                 <span class="text-xs font-medium uppercase tracking-wider">Active Prospects</span>
                                 <i class="fa-solid fa-bullseye text-amber-400"></i>
                             </div>
                             <div class="text-2xl font-bold text-slate-100" x-text="prospects.length"></div>
-                            <div class="text-xs text-slate-400 mt-2">90-Day Pipeline Active</div>
+                            <div class="text-xs text-slate-400 mt-2">
+                                <span x-text="prospects.filter(p => p.stage === 'Proposal Sent').length"></span> proposals pending
+                            </div>
                         </div>
 
-                        <div class="bg-dark-900 border border-slate-800 p-5 rounded-2xl">
+                        <div class="bg-dark-900 border border-slate-800 p-5 rounded-2xl shadow-sm">
                             <div class="flex items-center justify-between text-slate-400 mb-2">
-                                <span class="text-xs font-medium uppercase tracking-wider">Service Tickets</span>
+                                <span class="text-xs font-medium uppercase tracking-wider">Open Support Tickets</span>
                                 <i class="fa-solid fa-ticket text-rose-400"></i>
                             </div>
-                            <div class="text-2xl font-bold text-slate-100" x-text="tickets.filter(t => t.Status !== 'Closed').length"></div>
-                            <div class="text-xs text-rose-400 mt-2">Open support requests</div>
+                            <div class="text-2xl font-bold text-slate-100" x-text="tickets.filter(t => t.status !== 'Closed').length"></div>
+                            <div class="text-xs text-rose-400 mt-2">
+                                <span x-text="tickets.filter(t => t.priority === 'Critical' && t.status !== 'Closed').length"></span> critical priority
+                            </div>
                         </div>
 
-                        <div class="bg-dark-900 border border-slate-800 p-5 rounded-2xl">
+                        <div class="bg-dark-900 border border-slate-800 p-5 rounded-2xl shadow-sm">
                             <div class="flex items-center justify-between text-slate-400 mb-2">
-                                <span class="text-xs font-medium uppercase tracking-wider">Managed Clients</span>
+                                <span class="text-xs font-medium uppercase tracking-wider">Active MSP Clients</span>
                                 <i class="fa-solid fa-building-shield text-emerald-400"></i>
                             </div>
                             <div class="text-2xl font-bold text-slate-100" x-text="clients.length"></div>
-                            <div class="text-xs text-emerald-400 mt-2">SharePoint List Synced</div>
+                            <div class="text-xs text-emerald-400 mt-2">100% SLA compliant</div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity & Quick Follow-Up Radar -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 bg-dark-900 border border-slate-800 rounded-2xl p-5">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold text-slate-200">Active Sales Prospects (90-Day Plan)</h3>
+                                <button @click="currentTab = 'prospects'" class="text-xs text-indigo-400 hover:underline">View All</button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-800/50 text-slate-400 text-xs uppercase">
+                                        <tr>
+                                            <th class="p-3 rounded-l-lg">Prospect / Company</th>
+                                            <th class="p-3">Stage</th>
+                                            <th class="p-3">Day in Plan</th>
+                                            <th class="p-3 rounded-r-lg">Next Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-800">
+                                        <template x-for="p in prospects.slice(0, 5)" :key="p.id">
+                                            <tr class="hover:bg-slate-800/30">
+                                                <td class="p-3 font-medium text-slate-200" x-text="p.company"></td>
+                                                <td class="p-3">
+                                                    <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" x-text="p.stage"></span>
+                                                </td>
+                                                <td class="p-3 text-slate-300">
+                                                    Day <span class="font-bold text-indigo-400" x-text="p.dayInPlan"></span> / 90
+                                                </td>
+                                                <td class="p-3 text-xs text-slate-400" x-text="getNextMilestoneTitle(p.dayInPlan)"></td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Quick Service Desk Status -->
+                        <div class="bg-dark-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-semibold text-slate-200 mb-4">Service Desk Overview</h3>
+                                <div class="space-y-3">
+                                    <template x-for="ticket in tickets.slice(0, 4)" :key="ticket.id">
+                                        <div class="p-3 bg-slate-800/40 border border-slate-800 rounded-xl flex items-center justify-between">
+                                            <div>
+                                                <p class="text-xs font-semibold text-slate-200" x-text="ticket.title"></p>
+                                                <p class="text-[10px] text-slate-400" x-text="ticket.client"></p>
+                                            </div>
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold"
+                                                :class="ticket.priority === 'Critical' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'"
+                                                x-text="ticket.priority"></span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                            <button @click="currentTab = 'tickets'" class="mt-4 w-full py-2 bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 rounded-xl transition">Open Helpdesk Board</button>
                         </div>
                     </div>
                 </div>
@@ -139,34 +209,44 @@
                 <div x-show="currentTab === 'clients'" class="space-y-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h3 class="text-lg font-bold text-slate-100">SharePoint Managed Clients List</h3>
-                            <p class="text-xs text-slate-400">Live data pulled directly from your SharePoint Client Agreements list.</p>
+                            <h3 class="text-lg font-bold text-slate-100">Managed Clients</h3>
+                            <p class="text-xs text-slate-400">Manage client agreements, user counts, and recurring monthly revenue.</p>
                         </div>
-                        <button @click="openClientModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-xl font-medium transition flex items-center space-x-2">
+                        <button @click="openClientModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-xl font-medium transition shadow-sm flex items-center space-x-2">
                             <i class="fa-solid fa-plus"></i>
-                            <span>Add Client to SharePoint</span>
+                            <span>Add Client</span>
                         </button>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                        <template x-for="client in clients" :key="client.Id || client.id">
+                        <template x-for="client in clients" :key="client.id">
                             <div class="bg-dark-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-4">
                                 <div>
-                                    <h4 class="font-bold text-slate-100 text-base" x-text="client.Title || client.name"></h4>
-                                    <p class="text-xs text-slate-400" x-text="client.ContactPerson || client.contactPerson"></p>
+                                    <div class="flex items-start justify-between">
+                                        <div>
+                                            <h4 class="font-bold text-slate-100 text-base" x-text="client.name"></h4>
+                                            <p class="text-xs text-slate-400" x-text="client.contactPerson"></p>
+                                        </div>
+                                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" x-text="client.tier"></span>
+                                    </div>
                                     <div class="mt-4 space-y-2 text-xs text-slate-300">
                                         <div class="flex justify-between">
-                                            <span class="text-slate-400">MRR:</span>
-                                            <span class="font-bold text-emerald-400" x-text="formatCurrency(client.MRR || client.mrr)"></span>
+                                            <span class="text-slate-400">Monthly MRR:</span>
+                                            <span class="font-bold text-emerald-400" x-text="formatCurrency(client.mrr)"></span>
                                         </div>
                                         <div class="flex justify-between">
-                                            <span class="text-slate-400">Endpoints:</span>
-                                            <span x-text="(client.Endpoints || client.endpoints) + ' Endpoints'"></span>
+                                            <span class="text-slate-400">Endpoints / Users:</span>
+                                            <span class="font-semibold" x-text="client.endpoints + ' Endpoints'"></span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-slate-400">Agreement Renewal:</span>
+                                            <span x-text="client.renewalDate"></span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="pt-3 border-t border-slate-800 flex justify-end space-x-2">
-                                    <button @click="deleteClient(client.Id || client.id)" class="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-xs text-rose-400 rounded-lg transition">Delete</button>
+                                    <button @click="editClient(client)" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 rounded-lg transition">Edit</button>
+                                    <button @click="deleteClient(client.id)" class="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-xs text-rose-400 rounded-lg transition">Delete</button>
                                 </div>
                             </div>
                         </template>
@@ -177,10 +257,10 @@
                 <div x-show="currentTab === 'tickets'" class="space-y-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h3 class="text-lg font-bold text-slate-100">Service Desk Helpdesk List</h3>
-                            <p class="text-xs text-slate-400">Managed via SharePoint REST API list items.</p>
+                            <h3 class="text-lg font-bold text-slate-100">Service Desk Tickets</h3>
+                            <p class="text-xs text-slate-400">Track and resolve technical support issues for your managed clients.</p>
                         </div>
-                        <button @click="openTicketModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-xl font-medium transition flex items-center space-x-2">
+                        <button @click="openTicketModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-xl font-medium transition shadow-sm flex items-center space-x-2">
                             <i class="fa-solid fa-plus"></i>
                             <span>New Ticket</span>
                         </button>
@@ -190,21 +270,41 @@
                         <table class="w-full text-left text-sm">
                             <thead class="bg-slate-800/50 text-slate-400 text-xs uppercase">
                                 <tr>
-                                    <th class="p-4">ID</th>
-                                    <th class="p-4">Issue / Title</th>
+                                    <th class="p-4">Ticket #</th>
+                                    <th class="p-4">Title / Issue</th>
                                     <th class="p-4">Client</th>
                                     <th class="p-4">Priority</th>
                                     <th class="p-4">Status</th>
+                                    <th class="p-4 text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-800">
-                                <template x-for="t in tickets" :key="t.Id || t.id">
+                                <template x-for="t in tickets" :key="t.id">
                                     <tr class="hover:bg-slate-800/30">
-                                        <td class="p-4 font-mono text-xs text-indigo-400" x-text="'#SP-' + (t.Id || t.id)"></td>
-                                        <td class="p-4 font-medium text-slate-200" x-text="t.Title || t.title"></td>
-                                        <td class="p-4 text-slate-300" x-text="t.ClientName || t.client"></td>
-                                        <td class="p-4" x-text="t.Priority || t.priority"></td>
-                                        <td class="p-4" x-text="t.Status || t.status"></td>
+                                        <td class="p-4 font-mono text-xs text-indigo-400" x-text="'#MSP-' + t.id"></td>
+                                        <td class="p-4 font-medium text-slate-200" x-text="t.title"></td>
+                                        <td class="p-4 text-slate-300" x-text="t.client"></td>
+                                        <td class="p-4">
+                                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold"
+                                                :class="{
+                                                    'bg-rose-500/10 text-rose-400 border border-rose-500/20': t.priority === 'Critical',
+                                                    'bg-amber-500/10 text-amber-400 border border-amber-500/20': t.priority === 'High',
+                                                    'bg-blue-500/10 text-blue-400 border border-blue-500/20': t.priority === 'Medium',
+                                                    'bg-slate-500/10 text-slate-400 border border-slate-500/20': t.priority === 'Low'
+                                                }" x-text="t.priority"></span>
+                                        </td>
+                                        <td class="p-4">
+                                            <select x-model="t.status" @change="saveData()" class="bg-dark-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                                                <option value="Open">Open</option>
+                                                <option value="In Progress">In Progress</option>
+                                                <option value="Waiting Client">Waiting Client</option>
+                                                <option value="Resolved">Resolved</option>
+                                                <option value="Closed">Closed</option>
+                                            </select>
+                                        </td>
+                                        <td class="p-4 text-right">
+                                            <button @click="deleteTicket(t.id)" class="text-rose-400 hover:text-rose-300 text-xs px-2 py-1"><i class="fa-solid fa-trash"></i></button>
+                                        </td>
                                     </tr>
                                 </template>
                             </tbody>
@@ -212,41 +312,116 @@
                     </div>
                 </div>
 
-                <!-- 4. SALES PIPELINE & 90-DAY POWER AUTOMATE TRIGGER TAB -->
+                <!-- 4. SALES PROSPECTS & 90-DAY PLAN TAB -->
                 <div x-show="currentTab === 'prospects'" class="space-y-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h3 class="text-lg font-bold text-slate-100">Sales Pipeline & Power Automate Trigger</h3>
-                            <p class="text-xs text-slate-400">Clicking 'Trigger Power Automate Email' updates the SharePoint list item column, firing your automated outreach flow.</p>
+                            <h3 class="text-lg font-bold text-slate-100">Sales Pipeline & 90-Day Follow-Up Engine</h3>
+                            <p class="text-xs text-slate-400">Aggressive automated follow-up sequences designed to close small business MSP contracts.</p>
                         </div>
-                        <button @click="openProspectModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-xl font-medium transition flex items-center space-x-2">
+                        <button @click="openProspectModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-xl font-medium transition shadow-sm flex items-center space-x-2">
                             <i class="fa-solid fa-user-plus"></i>
                             <span>Add Prospect</span>
                         </button>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                        <template x-for="p in prospects" :key="p.Id || p.id">
+                        <template x-for="p in prospects" :key="p.id">
                             <div class="bg-dark-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-4">
                                 <div>
-                                    <h4 class="font-bold text-slate-100 text-base" x-text="p.Title || p.company"></h4>
-                                    <p class="text-xs text-slate-400" x-text="(p.ContactName || p.contactName) + ' (' + (p.Email || p.email) + ')'"></p>
-                                    
+                                    <div class="flex items-start justify-between">
+                                        <div>
+                                            <h4 class="font-bold text-slate-100 text-base" x-text="p.company"></h4>
+                                            <p class="text-xs text-slate-400" x-text="p.contactName + ' (' + p.email + ')'"></p>
+                                        </div>
+                                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" x-text="p.stage"></span>
+                                    </div>
+
+                                    <!-- 90-Day Progress Bar -->
+                                    <div class="mt-4 space-y-2">
+                                        <div class="flex justify-between text-xs">
+                                            <span class="text-slate-400">90-Day Follow-Up Plan:</span>
+                                            <span class="font-bold text-indigo-400" x-text="'Day ' + p.dayInPlan + ' / 90'"></span>
+                                        </div>
+                                        <div class="w-full bg-slate-800 rounded-full h-2">
+                                            <div class="bg-indigo-600 h-2 rounded-full transition-all duration-300" :style="'width: ' + Math.min(100, (p.dayInPlan / 90) * 100) + '%'"></div>
+                                        </div>
+                                    </div>
+
                                     <div class="mt-4 p-3 bg-slate-800/40 border border-slate-800 rounded-xl space-y-1">
-                                        <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">90-Day Plan Day</p>
-                                        <p class="text-xs font-bold text-indigo-400" x-text="'Day ' + (p.DayInPlan || p.dayInPlan) + ' / 90'"></p>
+                                        <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Current Automated Template</p>
+                                        <p class="text-xs font-medium text-slate-200" x-text="getNextMilestoneTitle(p.dayInPlan)"></p>
                                     </div>
                                 </div>
 
                                 <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
-                                    <button @click="triggerPowerAutomateEmail(p)" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-xs text-white rounded-lg transition flex items-center space-x-1.5 shadow-sm">
-                                        <i class="fa-solid fa-bolt"></i>
-                                        <span>Trigger SP Email</span>
+                                    <button @click="previewEmail(p)" class="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-xs text-indigo-400 rounded-lg border border-indigo-500/30 transition flex items-center space-x-1.5">
+                                        <i class="fa-solid fa-envelope"></i>
+                                        <span>Send Template</span>
                                     </button>
-                                    <button @click="deleteProspect(p.Id || p.id)" class="px-2 py-1.5 bg-rose-500/10 text-rose-400 rounded-lg text-xs"><i class="fa-solid fa-trash"></i></button>
+                                    <div class="flex space-x-1">
+                                        <button @click="advanceProspectDay(p)" title="Advance 7 Days" class="px-2 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 rounded-lg transition">+7 Days</button>
+                                        <button @click="deleteProspect(p.id)" class="px-2 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-xs text-rose-400 rounded-lg transition"><i class="fa-solid fa-trash"></i></button>
+                                    </div>
                                 </div>
                             </div>
                         </template>
+                    </div>
+                </div>
+
+                <!-- 5. 90-DAY TEMPLATES & CAMPAIGNS TAB -->
+                <div x-show="currentTab === 'campaigns'" class="space-y-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-100">Automated 90-Day Email Sequence Library</h3>
+                        <p class="text-xs text-slate-400">Aggressive conversion templates engineered for Managed Service Provider prospects.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <template x-for="template in emailTemplates" :key="template.day">
+                            <div class="bg-dark-900 border border-slate-800 rounded-2xl p-5 space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" x-text="'Day ' + template.day + ' Milestone'"></span>
+                                    <span class="text-xs text-slate-400" x-text="template.trigger"></span>
+                                </div>
+                                <h4 class="font-bold text-slate-100 text-sm" x-text="template.title"></h4>
+                                <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-xs text-slate-300 font-mono whitespace-pre-wrap leading-relaxed" x-text="template.body"></div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- 6. SETTINGS TAB -->
+                <div x-show="currentTab === 'settings'" class="space-y-6 max-w-3xl">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-100">Settings & Setups Manager</h3>
+                        <p class="text-xs text-slate-400">Configure your MSP brand details, admin info, and customize automated follow-up rules.</p>
+                    </div>
+
+                    <div class="bg-dark-900 border border-slate-800 rounded-2xl p-6 space-y-5">
+                        <h4 class="font-semibold text-slate-200 text-sm border-b border-slate-800 pb-3">Company & Administrator Setup</h4>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">MSP Company Name</label>
+                                <input type="text" x-model="settings.companyName" @input="saveData()" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Admin / Owner Name</label>
+                                <input type="text" x-model="settings.adminName" @input="saveData()" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Admin Email</label>
+                                <input type="email" x-model="settings.adminEmail" @input="saveData()" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Default Follow-Up Interval (Days)</label>
+                                <input type="number" x-model="settings.followUpInterval" @input="saveData()" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-800 flex justify-end">
+                            <button @click="alert('Settings successfully saved!')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-5 py-2.5 rounded-xl font-medium transition">Save Configurations</button>
+                        </div>
                     </div>
                 </div>
 
@@ -254,122 +429,348 @@
         </main>
     </div>
 
-    <!-- SharePoint & App Logic Script -->
+    <!-- EMAIL PREVIEW & SEND MODAL -->
+    <div x-show="emailModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-lg p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-slate-100 text-sm">Automated Email Preview</h3>
+                <button @click="emailModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <span class="text-slate-400">To:</span> <span class="text-slate-200 font-medium" x-text="activeEmail.to"></span>
+                </div>
+                <div>
+                    <span class="text-slate-400">Subject:</span> <span class="text-slate-200 font-semibold" x-text="activeEmail.subject"></span>
+                </div>
+                <div class="bg-dark-950 p-4 rounded-xl border border-slate-800 font-mono text-slate-300 whitespace-pre-wrap leading-relaxed" x-text="activeEmail.body"></div>
+            </div>
+            <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
+                <button @click="emailModal = false" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Cancel</button>
+                <button @click="sendAutomatedEmail()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Send Email & Advance Day</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLIENT MODAL -->
+    <div x-show="clientModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-slate-100 text-sm">Manage Client Agreement</h3>
+                <button @click="clientModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-400 mb-1">Company Name</label>
+                    <input type="text" x-model="clientForm.name" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Contact Person</label>
+                    <input type="text" x-model="clientForm.contactPerson" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-400 mb-1">Monthly MRR ($)</label>
+                        <input type="number" x-model="clientForm.mrr" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">Endpoints</label>
+                        <input type="number" x-model="clientForm.endpoints" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Support Tier</label>
+                    <select x-model="clientForm.tier" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <option value="Silver Managed">Silver Managed</option>
+                        <option value="Gold Enterprise">Gold Enterprise</option>
+                        <option value="Platinum Security">Platinum Security</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Renewal Date</label>
+                    <input type="date" x-model="clientForm.renewalDate" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
+                <button @click="clientModal = false" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Cancel</button>
+                <button @click="saveClient()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Save Client</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TICKET MODAL -->
+    <div x-show="ticketModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-slate-100 text-sm">Create New Support Ticket</h3>
+                <button @click="ticketModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-400 mb-1">Issue Summary / Title</label>
+                    <input type="text" x-model="ticketForm.title" placeholder="e.g. Printer offline / VPN timeout" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Client Company</label>
+                    <select x-model="ticketForm.client" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <template x-for="c in clients" :key="c.id">
+                            <option :value="c.name" x-text="c.name"></option>
+                        </template>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Priority Level</label>
+                    <select x-model="ticketForm.priority" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                        <option value="Critical">Critical</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
+                <button @click="ticketModal = false" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Cancel</button>
+                <button @click="saveTicket()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Create Ticket</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROSPECT MODAL -->
+    <div x-show="prospectModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-slate-100 text-sm">Add Sales Prospect</h3>
+                <button @click="prospectModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-400 mb-1">Company Name</label>
+                    <input type="text" x-model="prospectForm.company" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Contact Name</label>
+                    <input type="text" x-model="prospectForm.contactName" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Email Address</label>
+                    <input type="email" x-model="prospectForm.email" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Pipeline Stage</label>
+                    <select x-model="prospectForm.stage" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <option value="Initial Outreach">Initial Outreach</option>
+                        <option value="Discovery Call">Discovery Call</option>
+                        <option value="Proposal Sent">Proposal Sent</option>
+                        <option value="Closed Won">Closed Won</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
+                <button @click="prospectModal = false" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Cancel</button>
+                <button @click="saveProspect()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Add Prospect</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUICK ADD MODAL -->
+    <div x-show="quickActionModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-sm p-6 space-y-3">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-slate-100 text-sm">Quick Actions</h3>
+                <button @click="quickActionModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-2 pt-2">
+                <button @click="quickActionModal = false; openClientModal()" class="w-full py-2.5 px-4 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 rounded-xl text-xs font-medium text-left flex items-center space-x-2">
+                    <i class="fa-solid fa-building-shield w-5"></i><span>Add New MSP Client</span>
+                </button>
+                <button @click="quickActionModal = false; openTicketModal()" class="w-full py-2.5 px-4 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-xl text-xs font-medium text-left flex items-center space-x-2">
+                    <i class="fa-solid fa-ticket w-5"></i><span>Create Helpdesk Ticket</span>
+                </button>
+                <button @click="quickActionModal = false; openProspectModal()" class="w-full py-2.5 px-4 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 rounded-xl text-xs font-medium text-left flex items-center space-x-2">
+                    <i class="fa-solid fa-bullseye w-5"></i><span>Add Sales Prospect</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alpine.js Component Script -->
     <script>
-        function mspSharePointCRM() {
+        function mspCRM() {
             return {
                 currentTab: 'dashboard',
-                isOnline: false,
                 tabs: [
                     { id: 'dashboard', name: 'Dashboard', icon: 'fa-solid fa-chart-pie' },
                     { id: 'clients', name: 'Managed Clients', icon: 'fa-solid fa-building-shield' },
                     { id: 'tickets', name: 'Service Desk', icon: 'fa-solid fa-ticket' },
-                    { id: 'prospects', name: 'Sales Pipeline', icon: 'fa-solid fa-bullseye' }
+                    { id: 'prospects', name: 'Sales Pipeline', icon: 'fa-solid fa-bullseye' },
+                    { id: 'campaigns', name: '90-Day Campaigns', icon: 'fa-solid fa-envelope-open-text' },
+                    { id: 'settings', name: 'Settings', icon: 'fa-solid fa-gear' }
                 ],
+                settings: {
+                    companyName: 'Lake Conroe Managed Services',
+                    adminName: 'Admin',
+                    adminEmail: 'admin@lakeconroemsg.com',
+                    followUpInterval: 7
+                },
                 clients: [
-                    { id: 1, Title: 'Conroe Marina & Boat Rentals', ContactPerson: 'Capt. Jim', MRR: 2450, Endpoints: 35 },
-                    { id: 2, Title: 'Lone Star Accounting Group', ContactPerson: 'Sarah Jenkins', MRR: 1200, Endpoints: 18 }
+                    { id: 1, name: 'Conroe Marina & Boat Rentals', contactPerson: 'Capt. Jim', tier: 'Gold Enterprise', mrr: 2450, endpoints: 35, renewalDate: '2026-11-15' },
+                    { id: 2, name: 'Lone Star Accounting Group', contactPerson: 'Sarah Jenkins', tier: 'Silver Managed', mrr: 1200, endpoints: 18, renewalDate: '2026-12-01' },
+                    { id: 3, name: 'Woodlands Legal Partners', contactPerson: 'Robert Vance', tier: 'Platinum Security', mrr: 4100, endpoints: 60, renewalDate: '2027-02-10' }
                 ],
                 tickets: [
-                    { id: 101, Title: 'VPN Gateway Timeout', ClientName: 'Conroe Marina & Boat Rentals', Priority: 'Critical', Status: 'In Progress' }
+                    { id: 101, title: 'VPN Gateway Timeout on Remote Access', client: 'Woodlands Legal Partners', priority: 'Critical', status: 'In Progress' },
+                    { id: 102, title: 'New Hire Workstation Provisioning', client: 'Lone Star Accounting Group', priority: 'Medium', status: 'Open' },
+                    { id: 103, title: 'Microsoft 365 Mailbox Sync Error', client: 'Conroe Marina & Boat Rentals', priority: 'High', status: 'Waiting Client' }
                 ],
                 prospects: [
-                    { id: 201, Title: 'Montgomery HVAC Solutions', ContactName: 'Mark Taylor', Email: 'mark@montgomeryhvac.com', DayInPlan: 45 }
+                    { id: 201, company: 'Montgomery HVAC Solutions', contactName: 'Mark Taylor', email: 'mark@montgomeryhvac.com', stage: 'Proposal Sent', dayInPlan: 45 },
+                    { id: 202, company: 'Lake Conroe Real Estate Co.', contactName: 'Elena Rostova', email: 'elena@lkrealty.com', stage: 'Discovery Call', dayInPlan: 14 },
+                    { id: 203, company: 'Pine Tree Auto Repair', contactName: 'Dave Miller', email: 'dave@pinetreeauto.com', stage: 'Initial Outreach', dayInPlan: 3 }
                 ],
+                emailTemplates: [
+                    { day: 1, trigger: 'Initial Outreach', title: 'The Hidden Cybersecurity Risk in Local Small Businesses', body: 'Hi [Name],\n\nMost local businesses in our area believe standard antivirus is enough to stop modern ransomware. Unfortunately, our security audits at Lake Conroe Managed Services show over 60% of small businesses have unpatched vulnerabilities...\n\nWould you be open to a 10-minute network assessment next Tuesday?' },
+                    { day: 15, trigger: 'Follow-Up 1', title: 'IT Downtime Cost Calculator for [Company]', body: 'Hi [Name],\n\nJust following up on my previous note. Did you know the average cost of downtime for a small business is over $300 per minute in lost productivity and recovery fees?\n\nLet’s ensure your infrastructure is bulletproof.' },
+                    { day: 30, trigger: 'Mid-Campaign Value', title: 'Free Network Vulnerability Scan for Lake Conroe Area Businesses', body: 'Hi [Name],\n\nWe are running complimentary network scans this month for local enterprises in the Conroe area. No strings attached—just clear visibility into your firewall and endpoint security.\n\nAre you available this Thursday at 10 AM?' },
+                    { day: 60, trigger: 'Proposal & Case Study', title: 'How We Saved Local Firms 40+ Hours of IT Headaches', body: 'Hi [Name],\n\nAttached is a brief case study on how we helped businesses similar to [Company] eliminate recurring IT disruptions while lowering overall overhead.\n\nLet’s schedule a brief chat to review your current tech stack.' },
+                    { day: 90, trigger: 'Final Push / Q4 Offer', title: 'Closing Out Q4: Complimentary IT Stack Review', body: 'Hi [Name],\n\nAs we close out the quarter, I wanted to reach out one last time regarding your IT infrastructure management. We have 2 onboarding slots left for next month.\n\nLet me know if you’d like to secure your spot.' }
+                ],
+                
+                // Modals state
+                quickActionModal: false,
+                clientModal: false,
+                ticketModal: false,
+                prospectModal: false,
+                emailModal: false,
+                
+                activeEmail: { to: '', subject: '', body: '' },
+                
+                clientForm: { id: null, name: '', contactPerson: '', tier: 'Silver Managed', mrr: 1000, endpoints: 10, renewalDate: '' },
+                ticketForm: { id: null, title: '', client: '', priority: 'Medium', status: 'Open' },
+                prospectForm: { id: null, company: '', contactName: '', email: '', stage: 'Initial Outreach', dayInPlan: 1 },
 
                 init() {
-                    this.fetchAllSharePointData();
+                    this.loadData();
                 },
 
-                // SharePoint REST API Integration Helper
-                async fetchSharePointList(listTitle) {
-                    if (typeof _spPageContextInfo === 'undefined') {
-                        this.isOnline = false;
-                        return null; // Fallback to local mock data if not hosted inside SharePoint
-                    }
-                    try {
-                        const siteUrl = _spPageContextInfo.webAbsoluteUrl;
-                        const response = await fetch(`${siteUrl}/_api/web/lists/getbytitle('${listTitle}')/items`, {
-                            headers: { "Accept": "application/json;odata=verbose" }
-                        });
-                        const data = await response.json();
-                        this.isOnline = true;
-                        return data.d.results;
-                    } catch (e) {
-                        console.error(`Error fetching SharePoint list ${listTitle}:`, e);
-                        this.isOnline = false;
-                        return null;
-                    }
+                saveData() {
+                    const data = {
+                        settings: this.settings,
+                        clients: this.clients,
+                        tickets: this.tickets,
+                        prospects: this.prospects
+                    };
+                    localStorage.setItem('msp_crm_data', JSON.stringify(data));
                 },
 
-                async fetchAllSharePointData() {
-                    const spClients = await this.fetchSharePointList('Clients');
-                    if (spClients) this.clients = spClients;
-
-                    const spTickets = await this.fetchSharePointList('ServiceTickets');
-                    if (spTickets) this.tickets = spTickets;
-
-                    const spProspects = await this.fetchSharePointList('SalesPipeline');
-                    if (spProspects) this.prospects = spProspects;
-                },
-
-                // Power Automate Trigger Function (Updates SharePoint item to fire flow)
-                async triggerPowerAutomateEmail(prospect) {
-                    const itemId = prospect.Id || prospect.id;
-                    if (typeof _spPageContextInfo === 'undefined') {
-                        alert(`[Offline Mock Mode] Power Automate trigger fired for ${prospect.Title || prospect.company}! SharePoint field 'TriggerEmail' set to true.`);
-                        return;
-                    }
-                    try {
-                        const siteUrl = _spPageContextInfo.webAbsoluteUrl;
-                        // Fetch request digest for SharePoint write operations
-                        const digestRes = await fetch(`${siteUrl}/_api/contextinfo`, { method: 'POST', headers: { "Accept": "application/json;odata=verbose" } });
-                        const digestData = await digestRes.json();
-                        const formDigest = digestData.d.GetContextWebInformation.FormDigestValue;
-
-                        // Update SharePoint item column 'TriggerEmail' to true to invoke Power Automate when modified
-                        const updateRes = await fetch(`${siteUrl}/_api/web/lists/getbytitle('SalesPipeline')/items(${itemId})`, {
-                            method: 'POST',
-                            headers: {
-                                "Accept": "application/json;odata=verbose",
-                                "Content-Type": "application/json;odata=verbose",
-                                "X-RequestDigest": formDigest,
-                                "IF-MATCH": "*",
-                                "X-HTTP-Method": "MERGE"
-                            },
-                            body: JSON.stringify({
-                                '__metadata': { 'type': 'SP.Data.SalesPipelineListItem' },
-                                'TriggerEmail': true,
-                                'LastTriggerDate': new Date().toISOString()
-                            })
-                        });
-
-                        if (updateRes.ok) {
-                            alert('Power Automate email trigger successfully sent to SharePoint!');
-                            this.fetchAllSharePointData();
-                        } else {
-                            alert('Failed to trigger SharePoint item update.');
+                loadData() {
+                    const saved = localStorage.getItem('msp_crm_data');
+                    if (saved) {
+                        try {
+                            const parsed = JSON.parse(saved);
+                            if (parsed.settings) this.settings = parsed.settings;
+                            if (parsed.clients) this.clients = parsed.clients;
+                            if (parsed.tickets) this.tickets = parsed.tickets;
+                            if (parsed.prospects) this.prospects = parsed.prospects;
+                        } catch (e) {
+                            console.error('Error loading saved data', e);
                         }
-                    } catch (e) {
-                        console.error('Power Automate trigger error:', e);
-                        alert('Error communicating with SharePoint REST API.');
                     }
                 },
 
                 totalMRR() {
-                    return this.clients.reduce((sum, c) => sum + Number(c.MRR || c.mrr || 0), 0);
+                    return this.clients.reduce((sum, c) => sum + Number(c.mrr || 0), 0);
                 },
 
                 formatCurrency(val) {
                     return '$' + Number(val).toLocaleString();
                 },
 
-                openClientModal() { alert('Client SharePoint creation form modal'); },
-                openTicketModal() { alert('Ticket SharePoint creation form modal'); },
-                openProspectModal() { alert('Prospect SharePoint creation form modal'); },
-                deleteClient(id) { this.clients = this.clients.filter(c => (c.Id || c.id) !== id); },
-                deleteTicket(id) { this.tickets = this.tickets.filter(t => (t.Id || t.id) !== id); },
-                deleteProspect(id) { this.prospects = this.prospects.filter(p => (p.Id || p.id) !== id); }
+                getNextMilestoneTitle(day) {
+                    const template = this.emailTemplates.slice().reverse().find(t => day >= t.day);
+                    return template ? `Day ${template.day}: ${template.title}` : 'Initial Outreach Sequence';
+                },
+
+                // Client CRUD
+                openClientModal(client = null) {
+                    if (client) {
+                        this.clientForm = { ...client };
+                    } else {
+                        this.clientForm = { id: Date.now(), name: '', contactPerson: '', tier: 'Silver Managed', mrr: 1000, endpoints: 10, renewalDate: new Date().toISOString().split('T')[0] };
+                    }
+                    this.clientModal = true;
+                },
+                editClient(client) {
+                    this.openClientModal(client);
+                },
+                saveClient() {
+                    if (!this.clientForm.name) return;
+                    const index = this.clients.findIndex(c => c.id === this.clientForm.id);
+                    if (index !== -1) {
+                        this.clients[index] = { ...this.clientForm };
+                    } else {
+                        this.clientForm.id = Date.now();
+                        this.clients.push({ ...this.clientForm });
+                    }
+                    this.saveData();
+                    this.clientModal = false;
+                },
+                deleteClient(id) {
+                    if (confirm('Are you sure you want to delete this client agreement?')) {
+                        this.clients = this.clients.filter(c => c.id !== id);
+                        this.saveData();
+                    }
+                },
+
+                // Ticket CRUD
+                openTicketModal() {
+                    this.ticketForm = { id: null, title: '', client: this.clients[0]?.name || '', priority: 'Medium', status: 'Open' };
+                    this.ticketModal = true;
+                },
+                saveTicket() {
+                    if (!this.ticketForm.title) return;
+                    this.ticketForm.id = Date.now();
+                    this.tickets.unshift({ ...this.ticketForm });
+                    this.saveData();
+                    this.ticketModal = false;
+                },
+                deleteTicket(id) {
+                    this.tickets = this.tickets.filter(t => t.id !== id);
+                    this.saveData();
+                },
+
+                // Prospect CRUD & Workflow
+                openProspectModal() {
+                    this.prospectForm = { id: null, company: '', contactName: '', email: '', stage: 'Initial Outreach', dayInPlan: 1 };
+                    this.prospectModal = true;
+                },
+                saveProspect() {
+                    if (!this.prospectForm.company) return;
+                    this.prospectForm.id = Date.now();
+                    this.prospects.push({ ...this.prospectForm });
+                    this.saveData();
+                    this.prospectModal = false;
+                },
+                deleteProspect(id) {
+                    this.prospects = this.prospects.filter(p => p.id !== id);
+                    this.saveData();
+                },
+                advanceProspectDay(p) {
+                    p.dayInPlan = Math.min(90, p.dayInPlan + 7);
+                    if (p.dayInPlan >= 30 && p.stage === 'Initial Outreach') p.stage = 'Discovery Call';
+                    if (p.dayInPlan >= 60 && p.stage === 'Discovery Call') p.stage = 'Proposal Sent';
+                    this.saveData();
+                },
+                previewEmail(p) {
+                    const template = this.emailTemplates.slice().reverse().find(t => p.dayInPlan >= t.day) || this.emailTemplates[0];
+                    let body = template.body.replace(/\[Name\]/g, p.contactName).replace(/\[Company\]/g, p.company);
+                    let subject = template.title.replace(/\[Company\]/g, p.company);
+                    this.activeEmail = { to: p.email, subject, body, prospectId: p.id };
+                    this.emailModal = true;
+                },
+                sendAutomatedEmail() {
+                    alert('Automated email successfully sent to prospect!');
+                    this.emailModal = false;
+                }
             };
         }
     </script>
