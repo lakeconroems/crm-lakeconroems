@@ -255,9 +255,14 @@
                                             <span class="text-slate-400">Agreement Renewal:</span>
                                             <span x-text="client.renewalDate"></span>
                                         </div>
+                                        <!-- Note preview snippet if notes exist -->
+                                        <div x-show="client.notes" class="mt-2 p-2 bg-dark-950 rounded-lg border border-slate-800 text-[11px] text-slate-400 truncate">
+                                            <i class="fa-solid fa-note-sticky text-sky-400 mr-1"></i> <span x-text="client.notes"></span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="pt-3 border-t border-slate-800 flex justify-end space-x-2">
+                                    <button @click="openClientNotesModal(client)" class="px-3 py-1.5 bg-sky-500/20 hover:bg-sky-500/30 text-xs text-sky-400 rounded-lg border border-sky-500/30 transition">Add Notes</button>
                                     <button @click="openClientFile(client)" class="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-xs text-indigo-400 rounded-lg border border-indigo-500/30 transition">View File</button>
                                     <button @click="editClient(client)" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 rounded-lg transition">Edit</button>
                                     <button @click="deleteClient(client.id)" class="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-xs text-rose-400 rounded-lg transition">Delete</button>
@@ -559,10 +564,37 @@
                         <input type="text" x-model="clientForm.renewalDate" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
                     </div>
                 </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Internal Notes / Reminders</label>
+                    <textarea x-model="clientForm.notes" rows="3" class="w-full bg-dark-950 border border-slate-700 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-indigo-500 resize-none" placeholder="Account notes..."></textarea>
+                </div>
             </div>
             <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
                 <button @click="clientModalOpen = false" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Cancel</button>
                 <button @click="saveClientForm()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Save Client</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLIENT NOTES MODAL -->
+    <div x-show="clientNotesModalOpen" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-note-sticky text-sky-400"></i>
+                    <h3 class="font-bold text-slate-100 text-sm" x-text="'Client Notes: ' + (activeClientForNotes?.name || '')"></h3>
+                </div>
+                <button @click="clientNotesModalOpen = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-400 mb-1">Notes & Account Reminders</label>
+                    <textarea x-model="clientNotesText" rows="5" class="w-full bg-dark-950 border border-slate-700 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-indigo-500 resize-none" placeholder="Enter notes or account reminders for this client file..."></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
+                <button @click="clientNotesModalOpen = false" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Cancel</button>
+                <button @click="saveClientNotes()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Save Notes</button>
             </div>
         </div>
     </div>
@@ -740,6 +772,12 @@
                     </div>
                 </div>
 
+                <!-- Client Notes Section inside File Modal -->
+                <div class="space-y-2">
+                    <label class="block font-semibold text-slate-300">Client Notes & Account Reminders</label>
+                    <div class="p-3.5 bg-slate-800/40 border border-slate-800 rounded-xl text-xs text-slate-300 whitespace-pre-wrap" x-text="selectedClient?.notes || 'No notes recorded for this client yet.'"></div>
+                </div>
+
                 <div class="space-y-2">
                     <label class="block font-semibold text-slate-300">Active Support Tickets for Client</label>
                     <div class="space-y-2 max-h-40 overflow-y-auto">
@@ -759,9 +797,12 @@
                 </div>
             </div>
 
-            <div class="flex items-center justify-end pt-3 border-t border-slate-800 space-x-2">
-                <button @click="clientFileModal = false" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Close File</button>
-                <button @click="clientFileModal = false; editClient(selectedClient)" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Edit Agreement</button>
+            <div class="flex items-center justify-between pt-3 border-t border-slate-800">
+                <button @click="clientFileModal = false; openClientNotesModal(selectedClient)" class="px-4 py-2 bg-sky-500/20 hover:bg-sky-500/30 text-sky-400 border border-sky-500/30 rounded-xl text-xs font-medium">Edit Notes</button>
+                <div class="flex space-x-2">
+                    <button @click="clientFileModal = false" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Close File</button>
+                    <button @click="clientFileModal = false; editClient(selectedClient)" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Edit Agreement</button>
+                </div>
             </div>
         </div>
     </div>
@@ -845,6 +886,7 @@
                 currentTab: 'dashboard',
                 quickActionModal: false,
                 clientModalOpen: false,
+                clientNotesModalOpen: false,
                 prospectModalOpen: false,
                 ticketModalOpen: false,
                 emailPreviewModal: false,
@@ -852,6 +894,8 @@
                 clientFileModal: false,
                 ticketFileModal: false,
                 editingClient: null,
+                activeClientForNotes: null,
+                clientNotesText: '',
                 activeProspect: null,
                 selectedProspect: null,
                 selectedClient: null,
@@ -875,9 +919,9 @@
                 ],
 
                 clients: [
-                    { id: 1, name: 'Conroe Marine Logistics', contactPerson: 'Sarah Jenkins', mrr: 1850, endpoints: 28, tier: 'Total Care', renewalDate: '2026-11-15' },
-                    { id: 2, name: 'Montgomery Medical Group', contactPerson: 'Dr. Robert Vance', mrr: 3200, endpoints: 55, tier: 'Total Care', renewalDate: '2027-02-01' },
-                    { id: 3, name: 'Lake Conroe Realty', contactPerson: 'Mark Holloway', mrr: 950, endpoints: 14, tier: 'Co-Managed', renewalDate: '2026-09-30' }
+                    { id: 1, name: 'Conroe Marine Logistics', contactPerson: 'Sarah Jenkins', mrr: 1850, endpoints: 28, tier: 'Total Care', renewalDate: '2026-11-15', notes: 'Prefers morning check-ins. Primary point of contact for network upgrades.' },
+                    { id: 2, name: 'Montgomery Medical Group', contactPerson: 'Dr. Robert Vance', mrr: 3200, endpoints: 55, tier: 'Total Care', renewalDate: '2027-02-01', notes: 'Strict HIPAA compliance guidelines active on all workstations.' },
+                    { id: 3, name: 'Lake Conroe Realty', contactPerson: 'Mark Holloway', mrr: 950, endpoints: 14, tier: 'Co-Managed', renewalDate: '2026-09-30', notes: 'Co-managed agreement; internal IT handles tier-1 helpdesk.' }
                 ],
 
                 tickets: [
@@ -899,7 +943,7 @@
                     { day: 90, trigger: 'Final Closing Touch', title: 'Closing Out IT Planning', body: 'Hi [Contact Name],\n\nFinal check-in for this quarter. If you are still looking to stabilize your IT infrastructure before the busy season, our onboarding team has 2 slots left this month.' }
                 ],
 
-                clientForm: { name: '', contactPerson: '', mrr: 1000, endpoints: 10, tier: 'Total Care', renewalDate: '2027-01-01' },
+                clientForm: { name: '', contactPerson: '', mrr: 1000, endpoints: 10, tier: 'Total Care', renewalDate: '2027-01-01', notes: '' },
                 prospectForm: { company: '', contactName: '', email: '', stage: 'Initial Outreach', dayInPlan: 1 },
                 ticketForm: { title: '', client: '', priority: 'Medium' },
                 videoScriptContent: 'VIDEO TITLE: Who We Are & How We Help Small Business\n\n[00:00 - 00:15] SCENE: Drone shot over Lake Conroe transitioning to a busy local office.\nVOICE OVER: "Running a small business in Montgomery County is demanding enough without constant IT headaches."\n\n[00:15 - 00:35] SCENE: Technicians monitoring live dashboards and responding instantly to a helpdesk alert.\nVOICE OVER: "At Lake Conroe Managed Services, we act as your dedicated IT department. From 24/7 security monitoring to instant cloud backups, we ensure your business never misses a beat."',
@@ -936,6 +980,20 @@
                     this.ticketFileModal = true;
                 },
 
+                openClientNotesModal(client) {
+                    this.activeClientForNotes = client;
+                    this.clientNotesText = client.notes || '';
+                    this.clientNotesModalOpen = true;
+                },
+
+                saveClientNotes() {
+                    if (this.activeClientForNotes) {
+                        this.activeClientForNotes.notes = this.clientNotesText;
+                        this.saveData();
+                    }
+                    this.clientNotesModalOpen = false;
+                },
+
                 getProspectEmailBody(p) {
                     if (!p) return '';
                     const template = this.emailTemplates.slice().reverse().find(t => p.dayInPlan >= t.day) || this.emailTemplates[0];
@@ -944,7 +1002,7 @@
 
                 openClientModal() {
                     this.editingClient = null;
-                    this.clientForm = { name: '', contactPerson: '', mrr: 1200, endpoints: 15, tier: 'Total Care', renewalDate: '2027-01-01' };
+                    this.clientForm = { name: '', contactPerson: '', mrr: 1200, endpoints: 15, tier: 'Total Care', renewalDate: '2027-01-01', notes: '' };
                     this.clientModalOpen = true;
                 },
 
