@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lake Conroe Managed Services - MSP Command Center</title>
+    <title>Lake Conroe Managed Services - MSP CRM & Sales Suite</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -38,7 +38,7 @@
             <div>
                 <!-- Brand Header -->
                 <div class="p-5 border-b border-slate-800 flex items-center space-x-3">
-                    <div class="bg-indigo-600 p-2 rounded-lg text-white shadow-lg shadow-indigo-600/30">
+                    <div class="bg-indigo-600 p-2 rounded-lg text-white">
                         <i class="fa-solid fa-server text-lg"></i>
                     </div>
                     <div>
@@ -60,13 +60,15 @@
                 </nav>
             </div>
 
-            <!-- User Footer / Sync Status -->
+            <!-- User Footer -->
             <div class="p-4 border-t border-slate-800 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <div class="w-3 h-3 rounded-full" :class="isOnline ? 'bg-emerald-500 animate-pulse' : 'bg-indigo-500'"></div>
+                    <div class="w-9 h-9 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-sm border border-indigo-500/30">
+                        LC
+                    </div>
                     <div class="overflow-hidden">
-                        <p class="text-xs font-semibold text-slate-200" x-text="isOnline ? 'SharePoint Connected' : 'Local Storage Mode'"></p>
-                        <p class="text-[10px] text-slate-400">Auto-Sync Active</p>
+                        <p class="text-xs font-semibold text-slate-200 truncate" x-text="settings.adminName"></p>
+                        <p class="text-[10px] text-slate-400 truncate" x-text="settings.adminEmail"></p>
                     </div>
                 </div>
                 <button @click="currentTab = 'settings'" class="text-slate-400 hover:text-white transition">
@@ -81,6 +83,9 @@
             <!-- Top Header Bar -->
             <header class="h-16 bg-dark-900 border-b border-slate-800 flex items-center justify-between px-6 z-10">
                 <div class="flex items-center space-x-4">
+                    <div class="md:hidden">
+                        <span class="text-indigo-400 font-bold" x-text="settings.companyName"></span>
+                    </div>
                     <h2 class="text-lg font-semibold text-slate-100 capitalize" x-text="tabs.find(t => t.id === currentTab)?.name || 'Dashboard'"></h2>
                 </div>
                 <div class="flex items-center space-x-3">
@@ -240,7 +245,7 @@
                                     </div>
                                 </div>
                                 <div class="pt-3 border-t border-slate-800 flex justify-end space-x-2">
-                                    <button @click="openClientModal(client)" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 rounded-lg transition">Edit</button>
+                                    <button @click="editClient(client)" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 rounded-lg transition">Edit</button>
                                     <button @click="deleteClient(client.id)" class="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-xs text-rose-400 rounded-lg transition">Delete</button>
                                 </div>
                             </div>
@@ -385,7 +390,7 @@
                     </div>
                 </div>
 
-                <!-- 6. SETTINGS TAB -->
+                <!-- 6. SETTINGS & SETUPS TAB -->
                 <div x-show="currentTab === 'settings'" class="space-y-6 max-w-3xl">
                     <div>
                         <h3 class="text-lg font-bold text-slate-100">Settings & Setups Manager</h3>
@@ -414,8 +419,7 @@
                             </div>
                         </div>
 
-                        <div class="pt-4 border-t border-slate-800 flex justify-between items-center">
-                            <button @click="resetToDefaults()" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs px-4 py-2.5 rounded-xl font-medium transition">Reset Demo Data</button>
+                        <div class="pt-4 border-t border-slate-800 flex justify-end">
                             <button @click="alert('Settings successfully saved!')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-5 py-2.5 rounded-xl font-medium transition">Save Configurations</button>
                         </div>
                     </div>
@@ -425,8 +429,8 @@
         </main>
     </div>
 
-    <!-- EMAIL PREVIEW MODAL -->
-    <div x-show="emailModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
+    <!-- EMAIL PREVIEW & SEND MODAL -->
+    <div x-show="emailModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-lg p-6 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h3 class="font-bold text-slate-100 text-sm">Automated Email Preview</h3>
@@ -449,42 +453,38 @@
     </div>
 
     <!-- CLIENT MODAL -->
-    <div x-show="clientModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
+    <div x-show="clientModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="font-bold text-slate-100 text-sm" x-text="clientForm.id ? 'Edit Client Agreement' : 'Add New Client'"></h3>
+                <h3 class="font-bold text-slate-100 text-sm" x-text="clientForm.id ? 'Edit Client' : 'Add Managed Client'"></h3>
                 <button @click="clientModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="space-y-3 text-xs">
                 <div>
                     <label class="block text-slate-400 mb-1">Company Name</label>
-                    <input type="text" x-model="clientForm.name" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    <input type="text" x-model="clientForm.name" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200">
                 </div>
                 <div>
-                    <label class="block text-slate-400 mb-1">Contact Person</label>
-                    <input type="text" x-model="clientForm.contactPerson" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    <label class="block text-slate-400 mb-1">Primary Contact</label>
+                    <input type="text" x-model="clientForm.contactPerson" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-slate-400 mb-1">Monthly MRR ($)</label>
-                        <input type="number" x-model="clientForm.mrr" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <input type="number" x-model="clientForm.mrr" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200">
                     </div>
                     <div>
-                        <label class="block text-slate-400 mb-1">Endpoints</label>
-                        <input type="number" x-model="clientForm.endpoints" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <label class="block text-slate-400 mb-1">Endpoints Count</label>
+                        <input type="number" x-model="clientForm.endpoints" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-slate-400 mb-1">Support Tier</label>
-                    <select x-model="clientForm.tier" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
-                        <option value="Silver Managed">Silver Managed</option>
-                        <option value="Gold Enterprise">Gold Enterprise</option>
-                        <option value="Platinum Security">Platinum Security</option>
+                    <label class="block text-slate-400 mb-1">Service Tier</label>
+                    <select x-model="clientForm.tier" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200">
+                        <option value="Total Care Managed">Total Care Managed</option>
+                        <option value="Co-Managed IT">Co-Managed IT</option>
+                        <option value="Cybersecurity Shield">Cybersecurity Shield</option>
                     </select>
-                </div>
-                <div>
-                    <label class="block text-slate-400 mb-1">Renewal Date</label>
-                    <input type="date" x-model="clientForm.renewalDate" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
                 </div>
             </div>
             <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
@@ -494,29 +494,67 @@
         </div>
     </div>
 
-    <!-- TICKET MODAL -->
-    <div x-show="ticketModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
+    <!-- PROSPECT MODAL -->
+    <div x-show="prospectModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="font-bold text-slate-100 text-sm">Create New Support Ticket</h3>
+                <h3 class="font-bold text-slate-100 text-sm">Add Sales Prospect</h3>
+                <button @click="prospectModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-400 mb-1">Company Name</label>
+                    <input type="text" x-model="prospectForm.company" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Contact Name</label>
+                    <input type="text" x-model="prospectForm.contactName" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Email Address</label>
+                    <input type="email" x-model="prospectForm.email" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Pipeline Stage</label>
+                    <select x-model="prospectForm.stage" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200">
+                        <option value="New Lead">New Lead</option>
+                        <option value="Initial Contact">Initial Contact</option>
+                        <option value="Discovery Call">Discovery Call</option>
+                        <option value="Proposal Sent">Proposal Sent</option>
+                        <option value="Negotiation">Negotiation</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
+                <button @click="prospectModal = false" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Cancel</button>
+                <button @click="saveProspect()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Add Prospect</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TICKET MODAL -->
+    <div x-show="ticketModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-slate-100 text-sm">Create Service Ticket</h3>
                 <button @click="ticketModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="space-y-3 text-xs">
                 <div>
-                    <label class="block text-slate-400 mb-1">Issue Summary / Title</label>
-                    <input type="text" x-model="ticketForm.title" placeholder="e.g. VPN Gateway Timeout" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-slate-400 mb-1">Client Company</label>
-                    <select x-model="ticketForm.client" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    <label class="block text-slate-400 mb-1">Client</label>
+                    <select x-model="ticketForm.client" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200">
                         <template x-for="c in clients" :key="c.id">
                             <option :value="c.name" x-text="c.name"></option>
                         </template>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-slate-400 mb-1">Priority Level</label>
-                    <select x-model="ticketForm.priority" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    <label class="block text-slate-400 mb-1">Issue / Title</label>
+                    <input type="text" x-model="ticketForm.title" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Priority</label>
+                    <select x-model="ticketForm.priority" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200">
                         <option value="Low">Low</option>
                         <option value="Medium">Medium</option>
                         <option value="High">High</option>
@@ -531,159 +569,92 @@
         </div>
     </div>
 
-    <!-- PROSPECT MODAL -->
-    <div x-show="prospectModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
-        <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="font-bold text-slate-100 text-sm">Add Sales Prospect</h3>
-                <button @click="prospectModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block text-slate-400 mb-1">Company Name</label>
-                    <input type="text" x-model="prospectForm.company" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-slate-400 mb-1">Contact Name</label>
-                    <input type="text" x-model="prospectForm.contactName" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-slate-400 mb-1">Email Address</label>
-                    <input type="email" x-model="prospectForm.email" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-slate-400 mb-1">Pipeline Stage</label>
-                    <select x-model="prospectForm.stage" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
-                        <option value="Initial Outreach">Initial Outreach</option>
-                        <option value="Discovery Call">Discovery Call</option>
-                        <option value="Proposal Sent">Proposal Sent</option>
-                        <option value="Closed Won">Closed Won</option>
-                    </select>
-                </div>
-            </div>
-            <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
-                <button @click="prospectModal = false" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Cancel</button>
-                <button @click="saveProspect()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Add Prospect</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- QUICK ADD MODAL -->
-    <div x-show="quickActionModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
-        <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-sm p-6 space-y-3">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="font-bold text-slate-100 text-sm">Quick Actions</h3>
-                <button @click="quickActionModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="space-y-2 pt-2">
-                <button @click="quickActionModal = false; openClientModal()" class="w-full py-2.5 px-4 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 rounded-xl text-xs font-medium text-left flex items-center space-x-2">
-                    <i class="fa-solid fa-building-shield w-5"></i><span>Add New MSP Client</span>
-                </button>
-                <button @click="quickActionModal = false; openTicketModal()" class="w-full py-2.5 px-4 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-xl text-xs font-medium text-left flex items-center space-x-2">
-                    <i class="fa-solid fa-ticket w-5"></i><span>Create Helpdesk Ticket</span>
-                </button>
-                <button @click="quickActionModal = false; openProspectModal()" class="w-full py-2.5 px-4 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 rounded-xl text-xs font-medium text-left flex items-center space-x-2">
-                    <i class="fa-solid fa-bullseye w-5"></i><span>Add Sales Prospect</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Alpine.js Component Script with Persistent Seeding -->
+    <!-- APPLICATION LOGIC -->
     <script>
         function mspCRM() {
             return {
                 currentTab: 'dashboard',
-                isOnline: false,
+                quickActionModal: false,
+                clientModal: false,
+                prospectModal: false,
+                ticketModal: false,
+                emailModal: false,
+                activeEmail: {},
+
+                settings: {
+                    companyName: 'Lake Conroe Managed Services',
+                    adminName: 'MSP Director',
+                    adminEmail: 'admin@lakeconroems.com',
+                    followUpInterval: 7
+                },
+
                 tabs: [
                     { id: 'dashboard', name: 'Dashboard', icon: 'fa-solid fa-chart-pie' },
                     { id: 'clients', name: 'Managed Clients', icon: 'fa-solid fa-building-shield' },
                     { id: 'tickets', name: 'Service Desk', icon: 'fa-solid fa-ticket' },
                     { id: 'prospects', name: 'Sales Pipeline', icon: 'fa-solid fa-bullseye' },
                     { id: 'campaigns', name: '90-Day Templates', icon: 'fa-solid fa-envelope-open-text' },
-                    { id: 'settings', name: 'Settings', icon: 'fa-solid fa-gear' }
+                    { id: 'settings', name: 'Settings & Setups', icon: 'fa-solid fa-gear' }
                 ],
-                settings: {
-                    companyName: 'Lake Conroe Managed Services',
-                    adminName: 'Admin',
-                    adminEmail: 'admin@lakeconroemsg.com',
-                    followUpInterval: 7
-                },
+
                 clients: [
-                    { id: 1, name: 'Conroe Marina & Boat Rentals', contactPerson: 'Capt. Jim', tier: 'Gold Enterprise', mrr: 2450, endpoints: 35, renewalDate: '2026-11-15' },
-                    { id: 2, name: 'Lone Star Accounting Group', contactPerson: 'Sarah Jenkins', tier: 'Silver Managed', mrr: 1200, endpoints: 18, renewalDate: '2026-12-01' },
-                    { id: 3, name: 'Woodlands Legal Partners', contactPerson: 'Robert Vance', tier: 'Platinum Security', mrr: 4100, endpoints: 60, renewalDate: '2027-02-10' }
+                    { id: 1, name: 'Conroe Legal Group', contactPerson: 'Sarah Jenkins', mrr: 1850, endpoints: 28, tier: 'Total Care Managed', renewalDate: '2026-11-15' },
+                    { id: 2, name: 'Lone Star Medical Clinic', contactPerson: 'Dr. Robert Vance', mrr: 3200, endpoints: 55, tier: 'Cybersecurity Shield', renewalDate: '2027-02-28' },
+                    { id: 3, name: 'Lakeview Logistics', contactPerson: 'Mark Sterling', mrr: 2100, endpoints: 35, tier: 'Total Care Managed', renewalDate: '2026-09-30' }
                 ],
+
                 tickets: [
-                    { id: 101, title: 'VPN Gateway Timeout on Remote Access', client: 'Woodlands Legal Partners', priority: 'Critical', status: 'In Progress' },
-                    { id: 102, title: 'New Hire Workstation Provisioning', client: 'Lone Star Accounting Group', priority: 'Medium', status: 'Open' },
-                    { id: 103, title: 'Microsoft 365 Mailbox Sync Error', client: 'Conroe Marina & Boat Rentals', priority: 'High', status: 'Waiting Client' }
+                    { id: 101, title: 'VPN Gateway Certificate Expiring', client: 'Conroe Legal Group', priority: 'High', status: 'In Progress' },
+                    { id: 102, title: 'Workstation Ransomware Simulation Failed', client: 'Lone Star Medical Clinic', priority: 'Critical', status: 'Open' },
+                    { id: 103, title: 'New Onboarding Setup - 3 Users', client: 'Lakeview Logistics', priority: 'Medium', status: 'Waiting Client' }
                 ],
+
                 prospects: [
-                    { id: 201, company: 'Montgomery HVAC Solutions', contactName: 'Mark Taylor', email: 'mark@montgomeryhvac.com', stage: 'Proposal Sent', dayInPlan: 45 },
-                    { id: 202, company: 'Lake Conroe Real Estate Co.', contactName: 'Elena Rostova', email: 'elena@lkrealty.com', stage: 'Discovery Call', dayInPlan: 14 },
-                    { id: 203, company: 'Pine Tree Auto Repair', contactName: 'Dave Miller', email: 'dave@pinetreeauto.com', stage: 'Initial Outreach', dayInPlan: 3 }
+                    { id: 1, company: 'Montgomery CPA Associates', contactName: 'David Ross', email: 'dross@montgomerycpa.com', stage: 'Proposal Sent', dayInPlan: 30 },
+                    { id: 2, company: 'Pine Tree Manufacturing', contactName: 'Elena Rostova', email: 'elena@pinetreemfg.com', stage: 'Discovery Call', dayInPlan: 7 },
+                    { id: 3, company: 'Southern HVAC Solutions', contactName: 'Greg Miller', email: 'greg@southernhvac.com', stage: 'Initial Contact', dayInPlan: 1 }
                 ],
+
                 emailTemplates: [
-                    { day: 1, trigger: 'Initial Outreach', title: 'The Hidden Cybersecurity Risk in Local Small Businesses', body: 'Hi [Name],\n\nMost local businesses in our area believe standard antivirus is enough to stop modern ransomware. Unfortunately, our security audits at Lake Conroe Managed Services show over 60% of small businesses have unpatched vulnerabilities...\n\nWould you be open to a 10-minute network assessment next Tuesday?' },
-                    { day: 15, trigger: 'Follow-Up 1', title: 'IT Downtime Cost Calculator for [Company]', body: 'Hi [Name],\n\nJust following up on my previous note. Did you know the average cost of downtime for a small business is over $300 per minute in lost productivity and recovery fees?\n\nLet’s ensure your infrastructure is bulletproof.' },
-                    { day: 30, trigger: 'Mid-Campaign Value', title: 'Free Network Vulnerability Scan for Lake Conroe Area Businesses', body: 'Hi [Name],\n\nWe are running complimentary network scans this month for local enterprises in the Conroe area. No strings attached—just clear visibility into your firewall and endpoint security.\n\nAre you available this Thursday at 10 AM?' },
-                    { day: 60, trigger: 'Proposal & Case Study', title: 'How We Saved Local Firms 40+ Hours of IT Headaches', body: 'Hi [Name],\n\nAttached is a brief case study on how we helped businesses similar to [Company] eliminate recurring IT disruptions while lowering overall overhead.\n\nLet’s schedule a brief chat to review your current tech stack.' },
-                    { day: 90, trigger: 'Final Push / Q4 Offer', title: 'Closing Out Q4: Complimentary IT Stack Review', body: 'Hi [Name],\n\nAs we close out the quarter, I wanted to reach out one last time regarding your IT infrastructure management. We have 2 onboarding slots left for next month.\n\nLet me know if you’d like to secure your spot.' }
+                    { day: 1, trigger: 'Initial Outreach', title: 'Day 1: Cybersecurity & Uptime Intro', body: 'Hi [ContactName],\n\nNoticed [Company] has been expanding around the lake area. Are your current IT support response times under 15 minutes?\n\nAt Lake Conroe Managed Services, we guarantee rapid resolution and 24/7 security shielding for local businesses.\n\nOpen to a quick 10-minute audit next Tuesday?' },
+                    { day: 7, trigger: 'Value Follow-Up', title: 'Day 7: The Hidden Cost of IT Downtime', body: 'Hi [ContactName],\n\nFollowing up on my previous note. Most small businesses lose over 30 hours a year to unresolved tech friction.\n\nLet us take proactive systems monitoring off your plate so your team stays 100% productive.' },
+                    { day: 14, trigger: 'Case Study', title: 'Day 14: How We Secured a Local Practice', body: 'Hi [ContactName],\n\nThought you might enjoy this quick case study on how we reduced compliance risks for a local medical practice in Conroe.\n\nWhen is a good time for a brief intro call?' },
+                    { day: 30, trigger: 'Proposal Touchpoint', title: 'Day 30: Custom MSP Service Proposal', body: 'Hi [ContactName],\n\nAttached is our customized Total Care Managed proposal tailored for [Company].\n\nLet’s review the breakdown and lock in your onboarding dates.' },
+                    { day: 60, trigger: 'Urgent Check-in', title: 'Day 60: Compliance & Backup Review', body: 'Hi [ContactName],\n\nChecking in to see if your quarterly data backup verification is squared away. Happy to run a free complimentary vulnerability scan for [Company].' },
+                    { day: 90, trigger: 'Final Push', title: 'Day 90: Final Q3 Partnership Opportunity', body: 'Hi [ContactName],\n\nClosing out our Q3 onboarding slots for managed clients. Let me know if you would like to lock in your IT infrastructure support before our roster fills up.' }
                 ],
-                
-                // Modals state
-                quickActionModal: false,
-                clientModal: false,
-                ticketModal: false,
-                prospectModal: false,
-                emailModal: false,
-                
-                activeEmail: { to: '', subject: '', body: '' },
-                
-                clientForm: { id: null, name: '', contactPerson: '', tier: 'Silver Managed', mrr: 1000, endpoints: 10, renewalDate: '' },
-                ticketForm: { id: null, title: '', client: '', priority: 'Medium', status: 'Open' },
-                prospectForm: { id: null, company: '', contactName: '', email: '', stage: 'Initial Outreach', dayInPlan: 1 },
+
+                clientForm: { id: null, name: '', contactPerson: '', mrr: 1000, endpoints: 10, tier: 'Total Care Managed', renewalDate: '2027-01-01' },
+                prospectForm: { company: '', contactName: '', email: '', stage: 'New Lead' },
+                ticketForm: { client: '', title: '', priority: 'Medium' },
 
                 init() {
-                    this.loadData();
-                },
-
-                saveData() {
-                    const data = {
-                        settings: this.settings,
-                        clients: this.clients,
-                        tickets: this.tickets,
-                        prospects: this.prospects
-                    };
-                    localStorage.setItem('msp_crm_data', JSON.stringify(data));
-                },
-
-                loadData() {
                     const saved = localStorage.getItem('msp_crm_data');
                     if (saved) {
                         try {
-                            const parsed = JSON.parse(saved);
-                            if (parsed.settings) this.settings = parsed.settings;
-                            // Only override if valid data exists, otherwise keep robust defaults
-                            if (parsed.clients && parsed.clients.length > 0) this.clients = parsed.clients;
-                            if (parsed.tickets && parsed.tickets.length > 0) this.tickets = parsed.tickets;
-                            if (parsed.prospects && parsed.prospects.length > 0) this.prospects = parsed.prospects;
+                            const data = JSON.parse(saved);
+                            this.clients = data.clients || this.clients;
+                            this.tickets = data.tickets || this.tickets;
+                            this.prospects = data.prospects || this.prospects;
+                            this.settings = data.settings || this.settings;
                         } catch (e) {
-                            console.error('Error loading saved data', e);
+                            console.error('Error loading saved state', e);
                         }
                     }
                 },
 
-                resetToDefaults() {
-                    if (confirm('Reset all data to default demo values?')) {
-                        localStorage.removeItem('msp_crm_data');
-                        location.reload();
-                    }
+                saveData() {
+                    const data = {
+                        clients: this.clients,
+                        tickets: this.tickets,
+                        prospects: this.prospects,
+                        settings: this.settings
+                    };
+                    localStorage.setItem('msp_crm_data', JSON.stringify(data));
                 },
 
                 totalMRR() {
-                    return this.clients.reduce((sum, c) => sum + Number(c.mrr || 0), 0);
+                    return this.clients.reduce((sum, c) => sum + Number(c.mrr), 0);
                 },
 
                 formatCurrency(val) {
@@ -691,21 +662,51 @@
                 },
 
                 getNextMilestoneTitle(day) {
-                    const template = this.emailTemplates.slice().reverse().find(t => day >= t.day);
-                    return template ? `Day ${template.day}: ${template.title}` : 'Initial Outreach Sequence';
+                    const template = this.emailTemplates.slice().reverse().find(t => day >= t.day) || this.emailTemplates[0];
+                    return template.title;
                 },
 
-                // Client CRUD
-                openClientModal(client = null) {
-                    if (client) {
-                        this.clientForm = { ...client };
-                    } else {
-                        this.clientForm = { id: null, name: '', contactPerson: '', tier: 'Silver Managed', mrr: 1200, endpoints: 15, renewalDate: new Date().toISOString().split('T')[0] };
+                previewEmail(prospect) {
+                    const template = this.emailTemplates.slice().reverse().find(t => prospect.dayInPlan >= t.day) || this.emailTemplates[0];
+                    let body = template.body
+                        .replace(/\[ContactName\]/g, prospect.contactName)
+                        .replace(/\[Company\]/g, prospect.company);
+
+                    this.activeEmail = {
+                        to: prospect.email,
+                        subject: template.title + ' - ' + this.settings.companyName,
+                        body: body,
+                        prospectId: prospect.id
+                    };
+                    this.emailModal = true;
+                },
+
+                sendAutomatedEmail() {
+                    const p = this.prospects.find(item => item.id === this.activeEmail.prospectId);
+                    if (p) {
+                        p.dayInPlan = Math.min(90, p.dayInPlan + 7);
+                        this.saveData();
                     }
+                    this.emailModal = false;
+                    alert('Automated email successfully sent and prospect advanced in the 90-day plan!');
+                },
+
+                advanceProspectDay(p) {
+                    p.dayInPlan = Math.min(90, p.dayInPlan + 7);
+                    this.saveData();
+                },
+
+                openClientModal() {
+                    this.clientForm = { id: null, name: '', contactPerson: '', mrr: 1000, endpoints: 10, tier: 'Total Care Managed', renewalDate: '2027-01-01' };
                     this.clientModal = true;
                 },
+
+                editClient(client) {
+                    this.clientForm = { ...client };
+                    this.clientModal = true;
+                },
+
                 saveClient() {
-                    if (!this.clientForm.name) return;
                     if (this.clientForm.id) {
                         const index = this.clients.findIndex(c => c.id === this.clientForm.id);
                         if (index !== -1) this.clients[index] = { ...this.clientForm };
@@ -716,64 +717,61 @@
                     this.saveData();
                     this.clientModal = false;
                 },
+
                 deleteClient(id) {
-                    if (confirm('Are you sure you want to delete this client agreement?')) {
+                    if (confirm('Are you sure you want to remove this client?')) {
                         this.clients = this.clients.filter(c => c.id !== id);
                         this.saveData();
                     }
                 },
 
-                // Ticket CRUD
-                openTicketModal() {
-                    this.ticketForm = { id: null, title: '', client: this.clients[0]?.name || '', priority: 'Medium', status: 'Open' };
-                    this.ticketModal = true;
-                },
-                saveTicket() {
-                    if (!this.ticketForm.title) return;
-                    this.ticketForm.id = Date.now();
-                    this.tickets.unshift({ ...this.ticketForm });
-                    this.saveData();
-                    this.ticketModal = false;
-                },
-                deleteTicket(id) {
-                    this.tickets = this.tickets.filter(t => t.id !== id);
-                    this.saveData();
-                },
-
-                // Prospect CRUD & Workflow
                 openProspectModal() {
-                    this.prospectForm = { id: null, company: '', contactName: '', email: '', stage: 'Initial Outreach', dayInPlan: 1 };
+                    this.prospectForm = { company: '', contactName: '', email: '', stage: 'New Lead' };
                     this.prospectModal = true;
                 },
+
                 saveProspect() {
                     if (!this.prospectForm.company) return;
-                    this.prospectForm.id = Date.now();
-                    this.prospects.push({ ...this.prospectForm });
+                    this.prospects.push({
+                        id: Date.now(),
+                        company: this.prospectForm.company,
+                        contactName: this.prospectForm.contactName,
+                        email: this.prospectForm.email,
+                        stage: this.prospectForm.stage,
+                        dayInPlan: 1
+                    });
                     this.saveData();
                     this.prospectModal = false;
                 },
+
                 deleteProspect(id) {
                     this.prospects = this.prospects.filter(p => p.id !== id);
                     this.saveData();
                 },
-                advanceProspectDay(p) {
-                    p.dayInPlan = Math.min(90, p.dayInPlan + 7);
-                    if (p.dayInPlan >= 30 && p.stage === 'Initial Outreach') p.stage = 'Discovery Call';
-                    if (p.dayInPlan >= 60 && p.stage === 'Discovery Call') p.stage = 'Proposal Sent';
+
+                openTicketModal() {
+                    this.ticketForm = { client: this.clients[0]?.name || '', title: '', priority: 'Medium' };
+                    this.ticketModal = true;
+                },
+
+                saveTicket() {
+                    if (!this.ticketForm.title) return;
+                    this.tickets.unshift({
+                        id: Math.floor(100 + Math.random() * 900),
+                        title: this.ticketForm.title,
+                        client: this.ticketForm.client,
+                        priority: this.ticketForm.priority,
+                        status: 'Open'
+                    });
                     this.saveData();
+                    this.ticketModal = false;
                 },
-                previewEmail(p) {
-                    const template = this.emailTemplates.slice().reverse().find(t => p.dayInPlan >= t.day) || this.emailTemplates[0];
-                    let body = template.body.replace(/\[Name\]/g, p.contactName).replace(/\[Company\]/g, p.company);
-                    let subject = template.title.replace(/\[Company\]/g, p.company);
-                    this.activeEmail = { to: p.email, subject, body, prospectId: p.id };
-                    this.emailModal = true;
-                },
-                sendAutomatedEmail() {
-                    alert('Automated email successfully triggered!');
-                    this.emailModal = false;
+
+                deleteTicket(id) {
+                    this.tickets = this.tickets.filter(t => t.id !== id);
+                    this.saveData();
                 }
-            };
+            }
         }
     </script>
 </body>
