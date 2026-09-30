@@ -600,11 +600,11 @@
                         <i class="fa-solid fa-note-sticky text-base"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-100 text-base" x-text="selectedClient?.name + ' - File Notes'"></h3>
+                        <h3 class="font-bold text-slate-100 text-base" x-text="selectedClient ? (selectedClient.name + ' - File Notes') : ''"></h3>
                         <p class="text-xs text-slate-400">Add or update file notes and client logs</p>
                     </div>
                 </div>
-                <button @click="clientNotesModal = false; if(selectedClient) clientFileModal = true;" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button @click="closeClientNotes()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-xs">
                 <div>
@@ -613,7 +613,7 @@
                 </div>
             </div>
             <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
-                <button @click="clientNotesModal = false; if(selectedClient) clientFileModal = true;" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Cancel</button>
+                <button @click="closeClientNotes()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Cancel</button>
                 <button @click="saveClientNotes()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Save Notes</button>
             </div>
         </div>
@@ -628,11 +628,11 @@
                         <i class="fa-solid fa-note-sticky text-base"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-100 text-base" x-text="'Ticket #MSP-' + (selectedTicket?.id || '') + ' - Notes'"></h3>
+                        <h3 class="font-bold text-slate-100 text-base" x-text="selectedTicket ? ('Ticket #MSP-' + selectedTicket.id + ' - Notes') : ''"></h3>
                         <p class="text-xs text-slate-400">Add or update troubleshooting notes and logs</p>
                     </div>
                 </div>
-                <button @click="ticketNotesModal = false; if(selectedTicket) ticketFileModal = true;" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button @click="closeTicketNotes()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-xs">
                 <div>
@@ -641,7 +641,7 @@
                 </div>
             </div>
             <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
-                <button @click="ticketNotesModal = false; if(selectedTicket) ticketFileModal = true;" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Cancel</button>
+                <button @click="closeTicketNotes()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Cancel</button>
                 <button @click="saveTicketNotes()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Save Notes</button>
             </div>
         </div>
@@ -656,11 +656,11 @@
                         <i class="fa-solid fa-note-sticky text-base"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-100 text-base" x-text="(selectedProspect?.company || '') + ' - Prospect Notes'"></h3>
+                        <h3 class="font-bold text-slate-100 text-base" x-text="selectedProspect ? (selectedProspect.company + ' - Prospect Notes') : ''"></h3>
                         <p class="text-xs text-slate-400">Add or update sales pipeline and call notes</p>
                     </div>
                 </div>
-                <button @click="prospectNotesModal = false; if(selectedProspect) prospectFileModal = true;" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button @click="closeProspectNotes()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3 text-xs">
                 <div>
@@ -669,7 +669,7 @@
                 </div>
             </div>
             <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
-                <button @click="prospectNotesModal = false; if(selectedProspect) prospectFileModal = true;" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Cancel</button>
+                <button @click="closeProspectNotes()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Cancel</button>
                 <button @click="saveProspectNotes()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Save Notes</button>
             </div>
         </div>
@@ -772,8 +772,8 @@
                         <i class="fa-solid fa-folder-open text-base"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-100 text-base" x-text="selectedProspect?.company"></h3>
-                        <p class="text-xs text-slate-400" x-text="'Prospect File & 90-Day Sequence History'"></p>
+                        <h3 class="font-bold text-slate-100 text-base" x-text="selectedProspect?.company || ''"></h3>
+                        <p class="text-xs text-slate-400">Prospect File & 90-Day Sequence History</p>
                     </div>
                 </div>
                 <button @click="prospectFileModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -783,15 +783,15 @@
                 <div class="grid grid-cols-2 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
                     <div>
                         <span class="text-slate-400 block">Contact Name:</span>
-                        <span class="font-semibold text-slate-200 text-sm" x-text="selectedProspect?.contactName"></span>
+                        <span class="font-semibold text-slate-200 text-sm" x-text="selectedProspect?.contactName || ''"></span>
                     </div>
                     <div>
                         <span class="text-slate-400 block">Email Address:</span>
-                        <span class="font-semibold text-indigo-400 text-sm" x-text="selectedProspect?.email"></span>
+                        <span class="font-semibold text-indigo-400 text-sm" x-text="selectedProspect?.email || ''"></span>
                     </div>
                     <div>
                         <span class="text-slate-400 block mt-2">Pipeline Stage:</span>
-                        <span class="px-2.5 py-1 inline-block mt-1 rounded-full font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" x-text="selectedProspect?.stage"></span>
+                        <span class="px-2.5 py-1 inline-block mt-1 rounded-full font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" x-text="selectedProspect?.stage || ''"></span>
                     </div>
                     <div>
                         <span class="text-slate-400 block mt-2">90-Day Plan Status:</span>
@@ -838,8 +838,8 @@
                         <i class="fa-solid fa-building-shield text-base"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-100 text-base" x-text="selectedClient?.name"></h3>
-                        <p class="text-xs text-slate-400" x-text="'Managed Client Agreement & Service History'"></p>
+                        <h3 class="font-bold text-slate-100 text-base" x-text="selectedClient?.name || ''"></h3>
+                        <p class="text-xs text-slate-400">Managed Client Agreement & Service History</p>
                     </div>
                 </div>
                 <button @click="clientFileModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -849,11 +849,11 @@
                 <div class="grid grid-cols-2 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
                     <div>
                         <span class="text-slate-400 block">Primary Contact:</span>
-                        <span class="font-semibold text-slate-200 text-sm" x-text="selectedClient?.contactPerson"></span>
+                        <span class="font-semibold text-slate-200 text-sm" x-text="selectedClient?.contactPerson || ''"></span>
                     </div>
                     <div>
                         <span class="text-slate-400 block">Service Tier:</span>
-                        <span class="font-semibold text-emerald-400 text-sm" x-text="selectedClient?.tier"></span>
+                        <span class="font-semibold text-emerald-400 text-sm" x-text="selectedClient?.tier || ''"></span>
                     </div>
                     <div>
                         <span class="text-slate-400 block mt-2">Monthly MRR:</span>
@@ -861,7 +861,7 @@
                     </div>
                     <div>
                         <span class="text-slate-400 block mt-2">Agreement Renewal:</span>
-                        <span class="font-semibold text-slate-200 text-sm mt-1 inline-block" x-text="selectedClient?.renewalDate"></span>
+                        <span class="font-semibold text-slate-200 text-sm mt-1 inline-block" x-text="selectedClient?.renewalDate || ''"></span>
                     </div>
                 </div>
 
@@ -909,8 +909,8 @@
                         <i class="fa-solid fa-ticket text-base"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-100 text-base" x-text="'Ticket #MSP-' + (selectedTicket?.id || '')"></h3>
-                        <p class="text-xs text-slate-400" x-text="selectedTicket?.title"></p>
+                        <h3 class="font-bold text-slate-100 text-base" x-text="selectedTicket ? ('Ticket #MSP-' + selectedTicket.id) : ''"></h3>
+                        <p class="text-xs text-slate-400" x-text="selectedTicket?.title || ''"></p>
                     </div>
                 </div>
                 <button @click="ticketFileModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -920,15 +920,15 @@
                 <div class="grid grid-cols-2 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
                     <div>
                         <span class="text-slate-400 block">Client Company:</span>
-                        <span class="font-semibold text-slate-200 text-sm" x-text="selectedTicket?.client"></span>
+                        <span class="font-semibold text-slate-200 text-sm" x-text="selectedTicket?.client || ''"></span>
                     </div>
                     <div>
                         <span class="text-slate-400 block">Priority Level:</span>
-                        <span class="font-semibold text-rose-400 text-sm" x-text="selectedTicket?.priority"></span>
+                        <span class="font-semibold text-rose-400 text-sm" x-text="selectedTicket?.priority || ''"></span>
                     </div>
                     <div>
                         <span class="text-slate-400 block mt-2">Current Status:</span>
-                        <select x-model="selectedTicket.status" @change="saveData()" class="mt-1 bg-dark-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <select :value="selectedTicket?.status" @change="if(selectedTicket) { selectedTicket.status = $event.target.value; saveData(); }" class="mt-1 bg-dark-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
                             <option value="Open">Open</option>
                             <option value="In Progress">In Progress</option>
                             <option value="Waiting Client">Waiting Client</option>
@@ -959,7 +959,7 @@
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <div>
                     <h3 class="font-bold text-slate-100 text-sm">Email Template Preview</h3>
-                    <p class="text-[10px] text-slate-400" x-text="'Sending to: ' + activeProspect?.company"></p>
+                    <p class="text-[10px] text-slate-400" x-text="activeProspect ? ('Sending to: ' + activeProspect.company) : ''"></p>
                 </div>
                 <button @click="emailPreviewModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -968,7 +968,7 @@
             </div>
             <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
                 <button @click="emailPreviewModal = false" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Close</button>
-                <button @click="alert('Template email successfully sent to ' + activeProspect?.email + '!'); emailPreviewModal = false;" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Send Email Now</button>
+                <button @click="alert('Template email successfully sent to ' + (activeProspect?.email || '') + '!'); emailPreviewModal = false;" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Send Email Now</button>
             </div>
         </div>
     </div>
@@ -1079,7 +1079,7 @@
 
                 openClientNotes(client) {
                     this.selectedClient = client;
-                    this.selectedClientNotes = client.notes || '';
+                    this.selectedClientNotes = client ? (client.notes || '') : '';
                     this.clientFileModal = false;
                     this.clientNotesModal = true;
                 },
@@ -1093,9 +1093,14 @@
                     this.clientFileModal = true;
                 },
 
+                closeClientNotes() {
+                    this.clientNotesModal = false;
+                    this.clientFileModal = true;
+                },
+
                 openTicketNotes(ticket) {
                     this.selectedTicket = ticket;
-                    this.selectedTicketNotes = ticket.notes || '';
+                    this.selectedTicketNotes = ticket ? (ticket.notes || '') : '';
                     this.ticketFileModal = false;
                     this.ticketNotesModal = true;
                 },
@@ -1109,9 +1114,14 @@
                     this.ticketFileModal = true;
                 },
 
+                closeTicketNotes() {
+                    this.ticketNotesModal = false;
+                    this.ticketFileModal = true;
+                },
+
                 openProspectNotes(prospect) {
                     this.selectedProspect = prospect;
-                    this.selectedProspectNotes = prospect.notes || '';
+                    this.selectedProspectNotes = prospect ? (prospect.notes || '') : '';
                     this.prospectFileModal = false;
                     this.prospectNotesModal = true;
                 },
@@ -1121,6 +1131,11 @@
                         this.selectedProspect.notes = this.selectedProspectNotes;
                         this.saveData();
                     }
+                    this.prospectNotesModal = false;
+                    this.prospectFileModal = true;
+                },
+
+                closeProspectNotes() {
                     this.prospectNotesModal = false;
                     this.prospectFileModal = true;
                 },
@@ -1138,6 +1153,7 @@
                 },
 
                 editClient(client) {
+                    if (!client) return;
                     this.editingClient = client.id;
                     this.clientForm = { ...client };
                     this.clientModalOpen = true;
@@ -1175,6 +1191,7 @@
                 },
 
                 advanceProspectDay(p) {
+                    if (!p) return;
                     p.dayInPlan += 7;
                     if (p.dayInPlan > 90) p.dayInPlan = 90;
                     this.saveData();
