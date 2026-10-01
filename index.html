@@ -647,35 +647,7 @@
         </div>
     </div>
 
-    <!-- PROSPECT NOTES MODAL -->
-    <div x-show="prospectNotesModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
-        <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-lg p-6 space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <div class="flex items-center space-x-3">
-                    <div class="bg-amber-500/20 text-amber-400 p-2.5 rounded-xl border border-amber-500/30">
-                        <i class="fa-solid fa-note-sticky text-base"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-slate-100 text-base" x-text="selectedProspect ? (selectedProspect.company + ' - Prospect Notes') : ''"></h3>
-                        <p class="text-xs text-slate-400">Add or update sales pipeline and call notes</p>
-                    </div>
-                </div>
-                <button @click="closeProspectNotes()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block text-slate-400 mb-1 font-medium">Prospect Notes / Call Log</label>
-                    <textarea x-model="selectedProspectNotes" rows="6" class="w-full bg-dark-950 border border-slate-700 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-indigo-500 font-mono text-xs leading-relaxed" placeholder="Type notes for this sales prospect..."></textarea>
-                </div>
-            </div>
-            <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
-                <button @click="closeProspectNotes()" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Cancel</button>
-                <button @click="saveProspectNotes()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Save Notes</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- PROSPECT MODAL -->
+   <!-- PROSPECT MODAL -->
     <div x-show="prospectModalOpen" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
         <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -718,6 +690,36 @@
             <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
                 <button @click="prospectModalOpen = false" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Cancel</button>
                 <button @click="saveProspectForm()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Add Prospect</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EMAIL PREVIEW MODAL -->
+    <div x-show="emailPreviewModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" style="display: none;">
+        <div class="bg-dark-900 border border-slate-800 rounded-2xl w-full max-w-lg p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-slate-100 text-sm">Preview Template Email</h3>
+                <button @click="emailPreviewModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-400 mb-1">To Email Address</label>
+                    <input type="text" x-model="activeProspect.email" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Subject</label>
+                    <input type="text" value="IT Infrastructure & Support - Lake Conroe Managed Services" class="w-full bg-dark-950 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">Milestone Message Body</label>
+                    <textarea rows="6" class="w-full bg-dark-950 border border-slate-700 rounded-xl p-3 text-slate-200 focus:outline-none focus:border-indigo-500 font-mono text-xs leading-relaxed" x-text="`Hi ${activeProspect.contactName},\n\nFollowing up on our 90-day IT strategy plan for ${activeProspect.company}. Let's schedule a time to secure your infrastructure before the busy season.`"></textarea>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
+                <button @click="emailPreviewModal = false" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Cancel</button>
+                <button @click="window.location.href = `mailto:${activeProspect.email}?subject=IT Support&body=Hi ${activeProspect.contactName}`; emailPreviewModal = false;" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Send via Email Client</button>
             </div>
         </div>
     </div>
