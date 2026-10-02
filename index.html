@@ -985,6 +985,10 @@
                 prospectModalOpen: false,
                 ticketModalOpen: false,
                 emailPreviewModal: false,
+                previewEmail(p) {
+            this.activeProspect = p || {};
+            this.emailPreviewModal = true;
+        },
                 prospectFileModal: false,
                 clientFileModal: false,
                 ticketFileModal: false,
