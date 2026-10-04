@@ -1044,19 +1044,7 @@
                     { day: 45, trigger: 'Mid-Campaign Proposal', title: 'Custom Co-Managed & Fully Managed IT Plans', body: 'Hi [Contact Name],\n\nFollowing up on our previous conversation. We have put together a transparent pricing tier designed specifically for [Company Name] to reduce your monthly IT overhead while upgrading security.' },
                     { day: 90, trigger: 'Final Closing Touch', title: 'Closing Out IT Planning', body: 'Hi [Contact Name],\n\nFinal check-in for this quarter. If you are still looking to stabilize your IT infrastructure before the busy season, our onboarding team has 2 slots left this month.' }
                 ],
-emailTemplates: [
-            { day: 1, trigger: 'Initial Introduction', title: 'The 24/7 Zero-Downtime Guarantee', body: '...' },
-            { day: 15, trigger: 'Pain Point Check-in', title: 'Hidden Cybersecurity Risks in SMBs', body: '...' },
-            { day: 45, trigger: 'Mid-Campaign Proposal', title: 'Custom Co-Managed & Fully Managed IT Plans', body: '...' },
-            { day: 90, trigger: 'Final Closing Touch', title: 'Closing Out IT Planning', body: '...' }
-      ],
 
-     
-        getProspectsForDay(day) {
-            return this.prospects.filter(p => p.dayInPlan === day);
-        },
-
-        clientForm: { name: '', contactPerson: '', ... },
                 clientForm: { name: '', contactPerson: '', mrr: 1000, endpoints: 10, tier: 'Total Care', renewalDate: '2027-01-01', notes: '' },
                 prospectForm: { company: '', contactName: '', email: '', stage: 'Initial Outreach', dayInPlan: 1, notes: '' },
                 ticketForm: { title: '', client: '', priority: 'Medium', notes: '' },
