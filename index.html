@@ -969,9 +969,9 @@
                 <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 font-mono text-slate-300 whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto" x-text="getActiveEmailBody()"></div>
             </div>
             <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
-                <button @click="emailPreviewModal = false" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Close</button>
-                <button @click="alert('Template email successfully sent to ' + (activeProspect?.email || '') + '!'); emailPreviewModal = false;" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Send Email Now</button>
-            </div>
+    <button @click="emailPreviewModal = false" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs">Cancel</button>
+    <button @click="window.location.href = `mailto:${activeProspect.email}?subject=IT Infrastructure & Support - Lake Conroe Managed Services&body=Hi ${activeProspect.contactName},\n\nFollowing up on our 90-day IT strategy plan for ${activeProspect.company}. Let's schedule a time to secure your infrastructure before the busy season.`; emailPreviewModal = false;" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-medium">Open in Email Client</button>
+</div>
         </div>
     </div>
 
