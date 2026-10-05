@@ -426,67 +426,8 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                       <template x-for="template in emailTemplates" :key="template.day">
-    <div class="bg-dark-900 border border-slate-800 rounded-2xl p-5 space-y-3">
-        
-        <!-- Dynamic Actionable Prospects Pill Bar -->
-        <div class="mb-4 bg-slate-900/40 p-2.5 rounded-lg border border-slate-800">
-            <div class="text-xs text-slate-400 mb-1.5 font-medium">
-                Matching Prospects in Pipeline (Day <span x-text="template.day"></span>):
-            </div>
-            
-            <template x-if="getProspectsForDay(template.day).length === 0">
-                <span class="text-xs text-slate-500 italic">No prospects currently on Day <span x-text="template.day"></span>.</span>
-            </template>
-            
-          <div class="flex flex-wrap gap-2">
-                <template x-for="prospect in getProspectsForDay(template.day)" :key="prospect.id">
-                    <div class="inline-flex items-center gap-2 bg-indigo-950/80 border border-indigo-800/60 rounded-full px-3 py-1 text-xs text-indigo-200 shadow-sm hover:border-indigo-500 transition-colors">
-                        
-                        <!-- Company Name (Click to trigger email action) -->
-                        <  span class="font-medium cursor-pointer hover:underline" 
-                              @click="triggerEmail(prospect, template.day)" 
-                              x-text="prospect.company"
-                              title="Click to trigger email">
-                        </span>
-
-                        <!-- Action Button: Advance to Next Milestone -->
-                        <button @click.stop="advanceProspect(prospect.id)" 
-                                class="text-indigo-400 hover:text-white bg-indigo-900/50 hover:bg-indigo-800 rounded-full p-0.5 transition-colors"
-                                title="Advance to next milestone">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </button>
-
-                    </div>
-                </template>
-            </div>
-        </div>
-
-        <!-- Card Header & Content -->
-        <div class="flex items-center justify-between">
-            <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" x-text="'Day ' + template.day + ' Milestone'"></span>
-            <span class="text-xs text-slate-400" x-text="template.trigger"></span>
-        </div>
-        
-        <h4 class="font-bold text-slate-100 text-sm" x-text="template.title"></h4>
-        
-        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-xs text-slate-300 font-mono whitespace-pre-wrap leading-relaxed" x-text="template.body"></div>
-        
-    </div>
-</template>
-        <!-- Your existing card content continues below -->
-        <div class="flex items-center justify-between">
-            <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" x-text="..."></span>
-            <span class="text-xs text-slate-400" x-text="template.trigger"></span>
-        </div>
-        <h4 class="font-bold text-slate-100 text-sm" x-text="template.title"></h4>
-        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-xs text-slate-300 font-mono whitespace-pre-wrap leading-rel">
-            <!-- email body text -->
-        </div>
-    </div>
-</template>
+                        <template x-for="template in emailTemplates" :key="template.day">
+                            <div class="bg-dark-900 border border-slate-800 rounded-2xl p-5 space-y-3">
                                 <div class="flex items-center justify-between">
                                     <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" x-text="'Day ' + template.day + ' Milestone'"></span>
                                     <span class="text-xs text-slate-400" x-text="template.trigger"></span>
@@ -1326,36 +1267,7 @@
                     }
                 }
             }
-        },
-emailTemplates: [
-    { day: 1, trigger: 'Initial Introduction', title: 'The 24/7 Zero-Downtime Guarantee', body: 'Most small business owners around Lake Conroe lose up to 40 hours a year to unexpected IT outages. At Lake Conroe Managed Services, we eliminate downtime entirely through proactive monitoring and rapid helpdesk response.\n\nAre you available for a brief 10-minute discovery call this week?' },
-    { day: 15, trigger: 'Pain Point Check-in', title: 'Hidden Cybersecurity Risks in SMBs', body: 'Hi [Contact Name],\n\nRecent data shows 60% of small businesses targeted by ransomware never fully recover. Is your current IT setup covered against modern ransomware variants?\n\nLet us run a complimentary security audit for your team.' },
-    { day: 45, trigger: 'Mid-Campaign Proposal', title: 'Custom Co-Managed & Fully Managed IT Plans', body: 'Hi [Contact Name],\n\nFollowing up on our previous conversation. We have put together a transparent pricing tier designed specifically for [Company Name] to reduce your monthly IT overhead while upgrading security.' },
-    { day: 90, trigger: 'Final Closing Touch', title: 'Closing Out IT Planning', body: 'Hi [Contact Name],\n\nFinal check-in for this quarter. If you are still looking to stabilize your IT infrastructure before the busy season, our onboarding team has 2 slots left this month.' }
-],
-
-// 2. Add these helper and action methods right next to your loadData() function:
-getProspectsForDay(day) {
-    return (this.prospects || []).filter(p => Number(p.dayInPlan) === Number(day));
-},
-
-advanceProspect(prospectId) {
-    const prospect = (this.prospects || []).find(p => p.id === prospectId);
-    if (!prospect) return;
-
-    const milestones = [1, 15, 45, 90];
-    const currentIndex = milestones.indexOf(Number(prospect.dayInPlan));
-
-    if (currentIndex !== -1 && currentIndex < milestones.length - 1) {
-        prospect.dayInPlan = milestones[currentIndex + 1];
-        // If you have a saveData method, call it here to persist to localStorage:
-        if (typeof this.saveData === 'function') this.saveData();
-    }
-},
-
-triggerEmail(prospect, day) {
-    alert(`Triggering Day ${day} email sequence for ${prospect.company}!`);
-},
+        }
     </script>
 </body>
 </html>
