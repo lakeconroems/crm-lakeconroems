@@ -429,7 +429,7 @@
                        <template x-for="template in emailTemplates" :key="template.day">
     <div class="bg-dark-900 border border-slate-800 rounded-2xl p-5 space-y-3">
         
-        <!-- Dynamic Matching Prospects Pill Bar -->
+        <!-- Dynamic Actionable Prospects Pill Bar -->
         <div class="mb-4 bg-slate-900/40 p-2.5 rounded-lg border border-slate-800">
             <div class="text-xs text-slate-400 mb-1.5 font-medium">
                 Matching Prospects in Pipeline (Day <span x-text="template.day"></span>):
@@ -441,8 +441,24 @@
             
             <div class="flex flex-wrap gap-2">
                 <template x-for="prospect in getProspectsForDay(template.day)" :key="prospect.id">
-                    <div class="inline-flex items-center bg-indigo-950/80 border border-indigo-800/60 rounded-full px-3 py-1 text-xs text-indigo-200">
-                        <span class="font-medium" x-text="prospect.company"></span>
+                    <div class="inline-flex items-center gap-2 bg-indigo-950/80 border border-indigo-800/60 rounded-full px-3 py-1 text-xs text-indigo-200 shadow-sm hover:border-indigo-500 transition-colors">
+                        
+                        <!-- Company Name (Click to trigger email action) -->
+                        <span class="font-medium cursor-pointer hover:underline" 
+                              @click="triggerEmail(prospect, template.day)" 
+                              x-text="prospect.company"
+                              title="Click to trigger email">
+                        </span>
+
+                        <!-- Action Button: Advance to Next Milestone -->
+                        <button @click.stop="advanceProspect(prospect.id)" 
+                                class="text-indigo-400 hover:text-white bg-indigo-900/50 hover:bg-indigo-800 rounded-full p-0.5 transition-colors"
+                                title="Advance to next milestone">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+
                     </div>
                 </template>
             </div>
@@ -460,44 +476,6 @@
         
     </div>
 </template>
-                <span class="text-xs text-slate-500 italic">No prospects currently on Day <span x-text="template.day"></span>.</span>
-            </template>
-            
-         <template x-for="template in emailTemplates" :key="template.day">
-    <div class="bg-dark-900 border border-slate-800 rounded-2xl p-5 space-y-3">
-        
-        <!-- Dynamic Matching Prospects Pill Bar -->
-        <div class="mb-4 bg-slate-900/40 p-2.5 rounded-lg border border-slate-800">
-            <div class="text-xs text-slate-400 mb-1.5 font-medium">
-                Matching Prospects in Pipeline (Day <span x-text="template.day"></span>):
-            </div>
-            
-            <template x-if="getProspectsForDay(template.day).length === 0">
-                <span class="text-xs text-slate-500 italic">No prospects currently on Day <span x-text="template.day"></span>.</span>
-            </template>
-            
-            <div class="flex flex-wrap gap-2">
-                <template x-for="prospect in getProspectsForDay(template.day)" :key="prospect.id">
-                    <div class="inline-flex items-center bg-indigo-950/80 border border-indigo-800/60 rounded-full px-3 py-1 text-xs text-indigo-200">
-                        <span class="font-medium" x-text="prospect.company"></span>
-                    </div>
-                </template>
-            </div>
-        </div>
-
-        <!-- Card Header & Content -->
-        <div class="flex items-center justify-between">
-            <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" x-text="'Day ' + template.day + ' Milestone'"></span>
-            <span class="text-xs text-slate-400" x-text="template.trigger"></span>
-        </div>
-        
-        <h4 class="font-bold text-slate-100 text-sm" x-text="template.title"></h4>
-        
-        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-xs text-slate-300 font-mono whitespace-pre-wrap leading-relaxed" x-text="template.body"></div>
-        
-    </div>
-</template>
-
         <!-- Your existing card content continues below -->
         <div class="flex items-center justify-between">
             <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" x-text="..."></span>
