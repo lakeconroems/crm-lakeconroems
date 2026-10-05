@@ -439,12 +439,12 @@
                 <span class="text-xs text-slate-500 italic">No prospects currently on Day <span x-text="template.day"></span>.</span>
             </template>
             
-            <div class="flex flex-wrap gap-2">
+          <div class="flex flex-wrap gap-2">
                 <template x-for="prospect in getProspectsForDay(template.day)" :key="prospect.id">
                     <div class="inline-flex items-center gap-2 bg-indigo-950/80 border border-indigo-800/60 rounded-full px-3 py-1 text-xs text-indigo-200 shadow-sm hover:border-indigo-500 transition-colors">
                         
                         <!-- Company Name (Click to trigger email action) -->
-                        <span class="font-medium cursor-pointer hover:underline" 
+                        <  span class="font-medium cursor-pointer hover:underline" 
                               @click="triggerEmail(prospect, template.day)" 
                               x-text="prospect.company"
                               title="Click to trigger email">
@@ -1326,7 +1326,36 @@
                     }
                 }
             }
-        }
+        },
+emailTemplates: [
+    { day: 1, trigger: 'Initial Introduction', title: 'The 24/7 Zero-Downtime Guarantee', body: 'Most small business owners around Lake Conroe lose up to 40 hours a year to unexpected IT outages. At Lake Conroe Managed Services, we eliminate downtime entirely through proactive monitoring and rapid helpdesk response.\n\nAre you available for a brief 10-minute discovery call this week?' },
+    { day: 15, trigger: 'Pain Point Check-in', title: 'Hidden Cybersecurity Risks in SMBs', body: 'Hi [Contact Name],\n\nRecent data shows 60% of small businesses targeted by ransomware never fully recover. Is your current IT setup covered against modern ransomware variants?\n\nLet us run a complimentary security audit for your team.' },
+    { day: 45, trigger: 'Mid-Campaign Proposal', title: 'Custom Co-Managed & Fully Managed IT Plans', body: 'Hi [Contact Name],\n\nFollowing up on our previous conversation. We have put together a transparent pricing tier designed specifically for [Company Name] to reduce your monthly IT overhead while upgrading security.' },
+    { day: 90, trigger: 'Final Closing Touch', title: 'Closing Out IT Planning', body: 'Hi [Contact Name],\n\nFinal check-in for this quarter. If you are still looking to stabilize your IT infrastructure before the busy season, our onboarding team has 2 slots left this month.' }
+],
+
+// 2. Add these helper and action methods right next to your loadData() function:
+getProspectsForDay(day) {
+    return (this.prospects || []).filter(p => Number(p.dayInPlan) === Number(day));
+},
+
+advanceProspect(prospectId) {
+    const prospect = (this.prospects || []).find(p => p.id === prospectId);
+    if (!prospect) return;
+
+    const milestones = [1, 15, 45, 90];
+    const currentIndex = milestones.indexOf(Number(prospect.dayInPlan));
+
+    if (currentIndex !== -1 && currentIndex < milestones.length - 1) {
+        prospect.dayInPlan = milestones[currentIndex + 1];
+        // If you have a saveData method, call it here to persist to localStorage:
+        if (typeof this.saveData === 'function') this.saveData();
+    }
+},
+
+triggerEmail(prospect, day) {
+    alert(`Triggering Day ${day} email sequence for ${prospect.company}!`);
+},
     </script>
 </body>
 </html>
